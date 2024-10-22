@@ -1,0 +1,19 @@
+.canvasWrapper {
+  width: 80vw;
+  height: 100%;
+
+  padding : 1rem 1rem 1rem;
+
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  outline: 0.25rem solid #eeeeee;
+  cursor: none;
+  touch-action: none;
+}
