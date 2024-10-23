@@ -15,7 +15,7 @@ interface Pixel {
   timestamp: string;
 }
 
-@WebSocketGateway(8080, { cors: { origin: '*' } })
+@WebSocketGateway(8443, { cors: { origin: '*' } })
 export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
