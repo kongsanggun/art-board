@@ -17,13 +17,14 @@ function App() {
     const startSocket = (name : any) => {
         setWelcome(false)
         setUserName(name)
-
-        socket.current = io(process.env.REACT_APP_URL, 
+        
+        socket.current = io(process.env.REACT_APP_URL!, 
             {
                 transports: ['websocket'], 
                 autoConnect: false,
             });
         socket.current.open();
+    
         socket.current.on("connect", () => {
             socket.current?.emit("enter", name);
         });
