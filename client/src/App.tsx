@@ -18,7 +18,7 @@ function App() {
         setWelcome(false)
         setUserName(name)
         
-        socket.current = io(process.env.REACT_APP_URL!, 
+        socket.current = io(process.env.REACT_APP_URL,
             {
                 transports: ['websocket'], 
                 autoConnect: false,
