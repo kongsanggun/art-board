@@ -88,7 +88,19 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('clear')
   async clearPixels(socket: Socket, data: Pixel): Promise<void> {
     const roomID = this.randomRoomID;
-    this.pixels[roomID].delete(data.location);
+    const serachNumber = Number(data.brashSize);
+
+    const [targetX, targetY] = data.location.split(',').map((v) => {
+      return Number(v);
+    });
+
+    for (let x = 0; x < serachNumber; x++) {
+      for (let y = 0; y < serachNumber; y++) {
+        const location = targetX + x + ',' + (targetY + y);
+        this.pixels[roomID].delete(location);
+      }
+    }
+
     this.server.to(roomID).emit('clear', { roomID, data });
   }
 }
