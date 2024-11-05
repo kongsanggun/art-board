@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
 
-import Topmenu from './components/top/topmenu';
 import Sidemenu from './components/side/sidemenu';
 import Canvas from './components/canvas/canvas';
 import Footer from './components/footer';
@@ -12,7 +11,25 @@ import { Socket, io } from 'socket.io-client';
 
 function App() {
 
+    const [userName, setUserName] = useState('');
+    const [userList, setUserList] = useState<String[]>([]);
+    const [welcome, setWelcome] = useState(true);
+    const [toggle, setToggle] = useState(false);
+
+    const [pixelData, setPixelData] = useState(new Pixel());
+
     const socket = useRef<Socket| null>(null);
+    const cousor = document.querySelector('.cousor') as HTMLElement;
+    const animateCursor = (e : any) => {
+        if(cousor === null) return;
+        cousor.style.left = `${e.clientX}px`;
+        cousor.style.top = `${e.clientY}px`;
+    }
+    window.addEventListener('mousemove', animateCursor);
+
+    useEffect(() => {
+        setWelcome(true)
+    }, [])
 
     const startSocket = (name : any) => {
         setWelcome(false)
@@ -72,38 +89,8 @@ function App() {
         })
     }
 
-    useEffect(() => {
-        setWelcome(true)
-    }, [])
-
-    const cousor = document.querySelector('.cousor') as HTMLElement;
-    const animateCursor = (e : any) => {
-        if(cousor === null) return;
-        cousor.style.left = `${e.clientX}px`;
-        cousor.style.top = `${e.clientY}px`;
-    }
-    window.addEventListener('mousemove', animateCursor);
-
-    const [userName, setUserName] = useState('');
-    const [welcome, setWelcome] = useState(true);
-    const [userList, setUserList] = useState<String[]>([]);
-    const [pixelData, setPixelData] = useState(new Pixel());
-
-    const setPixelHandler = (key : string, value : any) => {
-        const newPixel = pixelData
-
-        switch (key) {
-            case "brashSize" :
-                newPixel.brashSize = value
-                break;
-            case "eraseCheck" :
-                newPixel.eraseCheck = !newPixel.eraseCheck
-                break;
-            case "color" :
-                newPixel.color = value
-                break;
-        }
-
+    const setPixelHandler = (value : Pixel) => {
+        const newPixel = value;
         setPixelData(newPixel)
     }
 
@@ -126,17 +113,12 @@ function App() {
             {welcome ? <Welcome onOpenAlert = {startSocket}/> : null}
             <div className = {welcome ? 'blur' : ''}>
                 <div className="cousor"></div>
-                <div className='pageTitle'>
-                    <h1>사이버 방문록</h1>
-                </div>
-                <Topmenu handler = {setPixelHandler}/>
-
-                <div className='pageMain'>
-                    <Canvas pixelData = {pixelData} sendHanlder = {sendHanlder}/>
-                    <Sidemenu userList = {userList}/>
-                </div>
-
-                <Footer />
+                {
+                    toggle 
+                    ? <Sidemenu userList = {userList} toggleEvent = {() => {setToggle(!toggle)}} pixelData = {pixelData} handler = {setPixelHandler}/> 
+                    : <div className="sideButton" onClick={() => {setToggle(!toggle)}}/>
+                }
+                <Canvas pixelData = {pixelData} sendHanlder = {sendHanlder}/>
             </div>
         </>
     );

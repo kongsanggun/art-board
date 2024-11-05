@@ -88,8 +88,8 @@ const Canvas = ({ pixelData: pixelData, sendHanlder: sendHanlder }: any) => {
             <canvas className="canvas"
                 id="canvas"
                 ref={canvasRef} 
-                width="1024" 
-                height="1024"
+                width="2048" 
+                height="2048"
                 onPointerDown={drawDown}
                 onPointerMove={drawMove}
                 onPointerUp={drawUp}
