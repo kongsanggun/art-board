@@ -17,9 +17,14 @@
   margin: 0px;
 }
 
+div {
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
 .pageMain {
-  width: 2048px;
-  height: 2048px;
+  width: 100vw;
+  height: 100vh;
 
   padding-top: 1rem;
 
@@ -123,14 +128,12 @@
   }
 }
 
-/* 스크롤바 전체 영역 */
 ::-webkit-scrollbar {
-  width: 1rem;  /* 세로축 스크롤바 폭 너비 */
-  height: 1rem;  /* 가로축 스크롤바 폭 너비 */
+  width: 1rem;
+  height: 1rem; 
 }
 
-/* 스크롤바 막대 */
 ::-webkit-scrollbar-thumb {
-  background: #545454; /* 스크롤바 막대 색상 */
-  border: 0px; /* 스크롤바 막대 테두리 설정  */
+  background: #545454; 
+  border: 0px;
 }

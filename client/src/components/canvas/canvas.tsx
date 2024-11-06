@@ -12,11 +12,13 @@ const Canvas = ({ pixelData: pixelData, sendHanlder: sendHanlder }: any) => {
     // 캔버스 그리기 
     const draw = (e: any) => {
         const canvas: any = document.getElementById("canvas");
+        const scroll = document.querySelector(".canvasWrapper") as Element;
         const ctx = canvas.getContext("2d");
+
         ctx.fillStyle = pixelData.color;
 
-        const leftCanvas = (e.clientX - e.target.offsetLeft + window.scrollX);
-        const topCanvas = (e.clientY - e.target.offsetTop + window.scrollY);
+        const leftCanvas = (e.clientX - e.target.offsetLeft + scroll.scrollLeft);
+        const topCanvas = (e.clientY - e.target.offsetTop + scroll.scrollTop);
 
         const rateX = (e.target.width / e.target.offsetWidth);
         const rateY = (e.target.height / e.target.offsetHeight);
@@ -84,16 +86,17 @@ const Canvas = ({ pixelData: pixelData, sendHanlder: sendHanlder }: any) => {
     }
 
     return (
-        <div className="canvasWrapper">
+        <div className="canvasWrapper"
+        onPointerDown={drawDown}
+        onPointerMove={drawMove}
+        onPointerUp={drawUp}
+        onPointerLeave={drawLeave}
+        >
             <canvas className="canvas"
                 id="canvas"
                 ref={canvasRef} 
                 width="2048" 
-                height="2048"
-                onPointerDown={drawDown}
-                onPointerMove={drawMove}
-                onPointerUp={drawUp}
-                onPointerLeave={drawLeave}></canvas>
+                height="2048"></canvas>
         </div>
     )
 }
