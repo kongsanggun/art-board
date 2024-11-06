@@ -3,7 +3,6 @@ import './App.css';
 
 import Sidemenu from './components/side/sidemenu';
 import Canvas from './components/canvas/canvas';
-import Footer from './components/footer';
 import Welcome from './components/popup/welcome';
 import { Pixel } from './util/pixel';
 

@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
+
 import '../../App.css';
-import './sidemenu.css'
+import './sidemenu.css';
+
 import { Pixel } from '../../util/pixel';
 
+import Tool from './tool';
+import Title from './title';
+import UserList from './userList';
+
 const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: String[], toggleEvent: any, pixelData: Pixel, handler: any}) => {
-    
     const [history, setHistory] = useState(pixelData.colorHistory);
 
     useEffect(() => {
-        // TODO : 도구 및 브러쉬 크기의 정보를 불러온다.
         const color = document.querySelector('#color') as any;
         color.value = pixelData.color;
 
@@ -19,15 +23,10 @@ const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: String
         brash.className += ' btn_active';
     }, [])
 
-    const checkItemHandler = (e : any) => {
-        pixelData.eraseCheck = e
-        handler(pixelData)
-    }
-
     // 색 변경 적용
     const colorChange = (e : any) => {
         history.push(e.target.value as string);
-        setHistory(history.slice(-6, 5));
+        setHistory(history.slice(-4));
 
         pixelData.color = e.target.value as string
         pixelData.colorHistory = history
@@ -42,20 +41,26 @@ const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: String
     }
 
     const ToolChange = (e : any) => {
+        const target = e.target.id
         document.querySelectorAll('.toolButton').forEach((item) => {
             item.className = item.className.replace(' btn_active', '')
         })
-        const test = document.querySelector('#' + e) as HTMLElement
-        test.className += ' btn_active';
-        checkItemHandler(e)
+
+        const active = document.querySelector('#' + target) as HTMLElement
+        active.className += ' btn_active';
+
+        pixelData.eraseCheck = (target === "true")
+        handler(pixelData)
     }
 
-    const brashChange = (value : any) => {
+    const brashChange = (e : any) => {
+        const value = e.target.id.replace("size_", "");
+
         document.querySelectorAll('.brashSize').forEach((item) => {
             item.className = item.className.replace(' btn_active', '')
         })
-        const test = document.querySelector('#size_' + value) as HTMLElement
-        test.className += ' btn_active';
+        const active = document.querySelector('#size_' + value) as HTMLElement
+        active.className += ' btn_active';
 
         pixelData.brashSize = value
         handler(pixelData)
@@ -66,52 +71,39 @@ const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: String
         cousor.style.width = `${value}px`;
         cousor.style.height = `${value}px`;
     }
-    
+
     return (
         <>
             <div className='sideCloseButton' onClick={toggleEvent}/>
             <div className='side'>
-                <div className="sideTitle">
-                    <span>사이버 방명록</span>
-                </div>
+                <Title title = {"사이버 방명록"} />
                 <div className="sideTool">
-                    <div className="toolTitle">도구</div>
-                    <div className="sideDiv">
+                    <Tool title="도구">
                         <div id="tool" className="toolDiv">
-                            <button id = "false" className = "toolButton" onClick={() => {ToolChange(false)}}> 펜 </button>
-                            <button id = "true" className = "toolButton" onClick={() => {ToolChange(true)}}> 지우개 </button>
+                            <button id="false" className="toolButton" onClick={ToolChange}> 펜 </button>
+                            <button id="true" className="toolButton" onClick={ToolChange}> 지우개 </button>
                         </div>
                         <div>
-                            <input className="toolButton" type="color" id='color' onBlur={colorChange} />
-                        </div>
-                    </div>
-                    <div className="toolTitle">색상 이력</div>
-                    <div className="toolDiv">
+                            <input id='color' className="toolButton" type="color" onBlur={colorChange}/>
+                        </div>        
+                    </Tool>
+                    <Tool title="색상 이력">
                         {
-                            history.map((item) => {
-                                return(<button className = "historyButton" style={{ background: item }} onClick={() => {ColorHisChange(item)}}> </button>)
-                            })
+                            pixelData.colorHistory.map((item) => {return(<button key="" className = "historyButton" style={{ background: item }} onClick={() => {ColorHisChange(item)}}> </button>)})
                         }
-                    </div>
-                    <div className="toolTitle">브러시 크기</div>
-                    <div id="brash" className="toolDiv">
-                        <button id = "size_7" className = "brashSize" onClick={() => {brashChange("7")}}> 큼 </button>
-                        <button id = "size_5" className = "brashSize" onClick={() => {brashChange("5")}}> 보통 </button>
-                        <button id = "size_3" className = "brashSize" onClick={() => {brashChange("3")}}> 작음 </button>
-                    </div>
+                    </Tool>
+                    <Tool title="브러시 크기">
+                        <div id="brash">
+                            <button id = "size_7" className = "brashSize" onClick={brashChange}> 큼 </button>
+                            <button id = "size_5" className = "brashSize" onClick={brashChange}> 보통 </button>
+                            <button id = "size_3" className = "brashSize" onClick={brashChange}> 작음 </button>
+                        </div>
+                    </Tool>
                 </div>
-                <div className="sideUser">
-                    <div className='userTotal'> 
-                            <span className = "user">접속자</span>
-                            <span id = "currentUser">{userList.length}</span> 
-                    </div>
-                    {userList.map((item : any) => {
-                        return (<div className='userInfo'> {item} </div>)
-                    })}
-                </div>
+                <UserList userList = {userList} />
             </div>
         </>
-    )
+    ) 
 }
 
 export default Sidemenu;
