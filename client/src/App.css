@@ -3,7 +3,7 @@
 }
 
 .pageTitle {
-  width: 100vw;
+  width: 100dvw;
   height: auto;
   
   padding-top: 0.5rem;
@@ -17,14 +17,9 @@
   margin: 0px;
 }
 
-div {
-  overflow-x: hidden;
-  overflow-y: hidden;
-}
-
 .pageMain {
-  width: 100vw;
-  height: 100vh;
+  width: 100dvw;
+  height: 100dvh;
 
   padding-top: 1rem;
 
@@ -32,9 +27,6 @@ div {
   justify-content: center;
   align-content: center;
   align-items: center;
-
-  overflow-x: hidden;
-  overflow-y: hidden;
 }
 
 .pageFooter {
@@ -42,7 +34,7 @@ div {
   padding-left: 1rem;
   padding-top: 1rem;
   border-top: 0.1rem solid #cfcfcf;
-  width: 100vw;
+  width: 100dvw;
   height: auto;
   font-size: 1.25rem;
 }
@@ -64,45 +56,15 @@ div {
   position: fixed;
 }
 
-.sideButton {
-  position: fixed;
-  left: 0px;
-  top: calc(50vh - 2rem);
-  z-index: 10;
-  height: 4rem;
-  width: 1rem;
-  background-color: #cfcfcf;
-
-  border-top-right-radius: 1rem;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 1rem;
-}
-
 @media screen and (max-width: 767px) {
-  .sideButton {
-    left: 2rem;
-    top: 0px;
-
-    height: 1rem;
-    width: 4rem;
-  
-    border-top-right-radius: 0;
-    border-bottom-left-radius: 1rem;
-    border-bottom-right-radius: 1rem;
-  }
-  
-  .sideButton:hover {
-    animation-name: hoverHight;
-    animation-duration: 0.25s;
-    animation-fill-mode: both;
+  .cousor {
+    display: none;
   }
 }
 
 @media screen and (min-width : 768px) {
-  .sideButton:hover {
-    animation-name: hoverWidth;
-    animation-duration: 0.25s;
-    animation-fill-mode: both;
+  .cousor {
+    display: block;
   }
 }
 

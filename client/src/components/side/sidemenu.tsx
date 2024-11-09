@@ -16,12 +16,12 @@ const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: String
         const color = document.querySelector('#color') as any;
         color.value = pixelData.color;
 
-        const tool = document.querySelector('#tool > #' + pixelData.eraseCheck) as HTMLElement
+        const tool = document.querySelector('#tool > #' + pixelData.tool) as HTMLElement
         tool.className += ' btn_active';
 
         const brash = document.querySelector('#brash > #size_' + pixelData.brashSize) as HTMLElement
         brash.className += ' btn_active';
-    }, [])
+    }, [pixelData.brashSize, pixelData.color, pixelData.tool])
 
     // 색 변경 적용
     const colorChange = (e : any) => {
@@ -42,14 +42,22 @@ const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: String
 
     const ToolChange = (e : any) => {
         const target = e.target.id
+        if(target === "move") {
+            const canvas = document.querySelector('.canvas') as HTMLElement
+            canvas.style.touchAction = "auto ";
+        } else {
+            const canvas = document.querySelector('.canvas') as HTMLElement
+            canvas.style.touchAction = "none";
+        }
+
         document.querySelectorAll('.toolButton').forEach((item) => {
-            item.className = item.className.replace(' btn_active', '')
+            item.className = "toolButton"
         })
 
         const active = document.querySelector('#' + target) as HTMLElement
-        active.className += ' btn_active';
+        active.className += ' btn_active'
 
-        pixelData.eraseCheck = (target === "true")
+        pixelData.tool = target
         handler(pixelData)
     }
 
@@ -80,8 +88,9 @@ const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: String
                 <div className="sideTool">
                     <Tool title="도구">
                         <div id="tool" className="toolDiv">
-                            <button id="false" className="toolButton" onClick={ToolChange}> 펜 </button>
-                            <button id="true" className="toolButton" onClick={ToolChange}> 지우개 </button>
+                            <button id="move" className="toolButton" onClick={ToolChange}> 없음 </button>
+                            <button id="pen" className="toolButton" onClick={ToolChange}> 펜 </button>
+                            <button id="erase" className="toolButton" onClick={ToolChange}> 지우개 </button>
                         </div>
                         <div>
                             <input id='color' className="toolButton" type="color" onBlur={colorChange}/>

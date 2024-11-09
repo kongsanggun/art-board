@@ -7,7 +7,8 @@ import Welcome from './components/popup/welcome';
 import { Pixel } from './util/pixel';
 
 import { Socket, io } from 'socket.io-client';
-
+import ShortCut from './components/shortcut/shortcut';
+ 
 function App() {
 
     const [userName, setUserName] = useState('');
@@ -95,7 +96,7 @@ function App() {
 
     const sendHanlder = (location : string) => {
         if (socket.current?.active) {
-            const massge = pixelData.eraseCheck ? "clear" : "draw";
+            const massge = pixelData.tool;
             const param = {
                 "RGB": pixelData.color,
                 "location": location,
@@ -109,16 +110,18 @@ function App() {
 
     return (
         <>
-            {welcome ? <Welcome onOpenAlert = {startSocket}/> : null}
-            <div className = {welcome ? 'blur' : ''}>
-                <div className="cousor"></div>
-                {
-                    toggle 
-                    ? <Sidemenu userList = {userList} toggleEvent = {() => {setToggle(!toggle)}} pixelData = {pixelData} handler = {setPixelHandler}/> 
-                    : <div className="sideButton" onClick={() => {setToggle(!toggle)}}/>
-                }
-                <Canvas pixelData = {pixelData} sendHanlder = {sendHanlder}/>
-            </div>
+            {
+                welcome ? <Welcome onOpenAlert = {startSocket}/> :             
+                <div className = {welcome ? 'blur' : ''}>
+                    <div className="cousor"></div>
+                    {
+                        toggle 
+                        ? <Sidemenu userList = {userList} toggleEvent = {() => {setToggle(!toggle)}} pixelData = {pixelData} handler = {setPixelHandler}/> 
+                        : <ShortCut toggleEvent = {() => {setToggle(!toggle)}} pixelData = {pixelData} handler = {setPixelHandler}/>
+                    }
+                    <Canvas pixelData = {pixelData} sendHanlder = {sendHanlder}/>
+                </div>
+            }
         </>
     );
 }

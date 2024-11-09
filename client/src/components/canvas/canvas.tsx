@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import '../../App.css';
 import './canvas.css'
+import { Pixel } from '../../util/pixel';
 
-const Canvas = ({ pixelData: pixelData, sendHanlder: sendHanlder }: any) => {
+const Canvas = ({ pixelData, sendHanlder }: {pixelData: Pixel, sendHanlder: any}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     let pointX = -1;
@@ -12,13 +13,12 @@ const Canvas = ({ pixelData: pixelData, sendHanlder: sendHanlder }: any) => {
     // 캔버스 그리기 
     const draw = (e: any) => {
         const canvas: any = document.getElementById("canvas");
-        const scroll = document.querySelector(".canvasWrapper") as Element;
         const ctx = canvas.getContext("2d");
 
         ctx.fillStyle = pixelData.color;
 
-        const leftCanvas = (e.clientX - e.target.offsetLeft + scroll.scrollLeft);
-        const topCanvas = (e.clientY - e.target.offsetTop + scroll.scrollTop);
+        const leftCanvas = (e.clientX - e.target.offsetLeft + window.scrollX);
+        const topCanvas = (e.clientY - e.target.offsetTop + window.scrollY);
 
         const rateX = (e.target.width / e.target.offsetWidth);
         const rateY = (e.target.height / e.target.offsetHeight);
@@ -35,26 +35,27 @@ const Canvas = ({ pixelData: pixelData, sendHanlder: sendHanlder }: any) => {
         const dy = pointY - y0;
 
         const steps = Math.max(Math.abs(dx), Math.abs(dy));
-        const xinc = dx / steps,
-            yinc = dy / steps;
+        const xinc = dx / steps, yinc = dy / steps;
 
-        for (let i = 0; i < steps; i++) {
-            x0 += xinc;
-            y0 += yinc;
-            const x1 = Math.round(x0);
-            const y1 = Math.round(y0);
-
-            if (pixelData.eraseCheck) {
-                ctx.clearRect(x1, y1, pixelData.brashSize, pixelData.brashSize);
-                sendHanlder(x1 + ',' + y1);
-            } else {
-                ctx.fillRect(x1, y1, pixelData.brashSize, pixelData.brashSize);
-                sendHanlder(x1 + ',' + y1);
+        if (steps <= 50) {
+            for (let i = 0; i < steps; i++) {
+                x0 += xinc;
+                y0 += yinc;
+                const x1 = Math.round(x0);
+                const y1 = Math.round(y0);
+    
+                if (pixelData.tool === "erase") {
+                    ctx.clearRect(x1, y1, pixelData.brashSize, pixelData.brashSize);
+                    sendHanlder(x1 + ',' + y1);
+                } else {
+                    ctx.fillRect(x1, y1, pixelData.brashSize, pixelData.brashSize);
+                    sendHanlder(x1 + ',' + y1);
+                }
             }
         }
 
         prvPoint = [pointX, pointY]
-        if (pixelData.eraseCheck) {
+        if (pixelData.tool === "erase") {
             ctx.clearRect(pointX, pointY, pixelData.brashSize, pixelData.brashSize);
             sendHanlder(pointX + ',' + pointY);
         } else {
@@ -65,6 +66,7 @@ const Canvas = ({ pixelData: pixelData, sendHanlder: sendHanlder }: any) => {
 
     // 캔버스 이동하기
     const drawMove = (e: any) => {
+        if(pixelData.tool === "move") return;
         if (prvPoint[0] > 0 && prvPoint[1] > 0) {
             draw(e)
         } 
@@ -77,11 +79,13 @@ const Canvas = ({ pixelData: pixelData, sendHanlder: sendHanlder }: any) => {
 
     // 캔버스 포인터 입력하기 
     const drawDown = (e: any) => {
+        if(pixelData.tool === "move") return;
         draw(e)
     }
 
     // 포인터가 캔버스에 떠났을 경우
     const drawLeave = (e: any) => {
+        if(pixelData.tool === "move") return;
         drawUp(e)
     }
 

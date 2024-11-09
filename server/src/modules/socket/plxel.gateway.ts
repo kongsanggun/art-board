@@ -77,15 +77,15 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('pixel', { roomID, pixelData });
   }
 
-  @SubscribeMessage('draw')
+  @SubscribeMessage('pen')
   async drawPixels(socket: Socket, data: Pixel): Promise<void> {
     // 정보를 저장한다.
     const roomID = this.randomRoomID;
     this.pixels[roomID].set(data.location, data);
-    this.server.to(roomID).emit('draw', { roomID, data });
+    this.server.to(roomID).emit('pen', { roomID, data });
   }
 
-  @SubscribeMessage('clear')
+  @SubscribeMessage('erase')
   async clearPixels(socket: Socket, data: Pixel): Promise<void> {
     const roomID = this.randomRoomID;
     const serachNumber = Number(data.brashSize);
@@ -101,6 +101,6 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }
 
-    this.server.to(roomID).emit('clear', { roomID, data });
+    this.server.to(roomID).emit('erase', { roomID, data });
   }
 }
