@@ -34,6 +34,7 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // 소켓 연결 해제
   async handleDisconnect(socket: Socket): Promise<void> {
     const roomID = this.randomRoomID;
+    const name = this.userList[roomID].get(socket.id);
     this.userList[roomID].delete(socket.id);
 
     const userList: string[] = [];
@@ -41,7 +42,7 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
       userList.push(item);
     }
 
-    this.server.to(roomID).emit('left', { roomID, userList });
+    this.server.to(roomID).emit('left', { roomID, userList, name });
     console.log(`Client ${socket.id} disconnected.`);
   }
 

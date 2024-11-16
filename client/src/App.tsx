@@ -16,6 +16,9 @@ function App() {
     const [welcome, setWelcome] = useState(true);
     const [toggle, setToggle] = useState(false);
 
+    const [enterToggle, setEnterToggle] = useState(false);
+    const [massage, setMassage] = useState('');
+
     const [pixelData, setPixelData] = useState(new Pixel());
 
     const socket = useRef<Socket| null>(null);
@@ -47,10 +50,16 @@ function App() {
         });
 
         socket.current.on("enter", (data) => {
+            setEnterToggle(true);
+            setMassage(data.userList[data.userList.length - 1] + "님이 입장하셨습니다.");
+            setTimeout(() => {setEnterToggle(false)}, 1500);
             setUserList(data.userList);
         })
 
         socket.current.on("left", (data) => {
+            setEnterToggle(true);
+            setMassage(data.name + "님이 퇴장하셨습니다.");
+            setTimeout(() => {setEnterToggle(false)}, 1500);
             setUserList(data.userList);
         })
 
@@ -113,6 +122,9 @@ function App() {
             {
                 welcome ? <Welcome onOpenAlert = {startSocket}/> :             
                 <div className = {welcome ? 'blur' : ''}>
+                    {
+                        enterToggle ? <div className='toggle'>{massage}</div>: null
+                    }
                     <div className="cousor"></div>
                     {
                         toggle 
