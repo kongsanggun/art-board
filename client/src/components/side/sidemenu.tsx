@@ -8,9 +8,11 @@ import { Pixel } from '../../util/pixel';
 import Tool from './tool';
 import Title from './title';
 import UserList from './userList';
+import Info from '../popup/info';
 
 const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: String[], toggleEvent: any, pixelData: Pixel, handler: any}) => {
     const [history, setHistory] = useState(pixelData.colorHistory);
+    const [infoPop, setInfoPop] = useState(false);
 
     useEffect(() => {
         const color = document.querySelector('#color') as any;
@@ -81,9 +83,10 @@ const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: String
 
     return (
         <>
+            {infoPop? <Info onOpenAlert = {() => {setInfoPop(!infoPop)}}/> : null}
             <div className='sideCloseButton' onClick={toggleEvent}/>
             <div className='side'>
-                <Title title = {"사이버 방명록"} />
+                <Title title = {"사이버 방명록"} handler = {() => {setInfoPop(!infoPop)}}/>
                 <div className="sideTool">
                     <Tool title="도구">
                         <div id="tool" className="toolDiv">

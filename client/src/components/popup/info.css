@@ -1,0 +1,54 @@
+.infoBack {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 40;
+  display: flex;
+  justify-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100dvw;
+  height: 100dvh;
+  background: rgba(0,0,0,0.3);
+}
+
+.infoEmpty {
+  position: fixed;
+  z-index: 40;
+  width: 100%;
+  height: 100%;
+}
+
+.info {
+  position: fixed;
+  z-index: 50;
+  background: white;
+  border: 2px solid rgb(91, 91, 91);
+  border-radius: 1rem;
+  width: 80dvw;
+  max-width: 560px;
+  height: 300px;
+
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  vertical-align: middle;
+  justify-content: center;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  align-items: center;
+}
+
+.infoBtn{
+  width: 100px;
+  height: 30px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-size: 16px;
+  justify-content: center;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+}

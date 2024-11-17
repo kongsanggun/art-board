@@ -22,6 +22,7 @@ const Welcome = ({ onOpenAlert }: { onOpenAlert: any }) => {
             <div className="popupEmpty"> </div>
             <div className="popup">
                 <h1>사이버 방문록에 오신 것을 환영합니다.</h1>
+                <p>방문록 내용</p>
                 <p>아래의 닉네임을 입력해주시고 입장해주세요</p>
                 <input id="userName"
                         className="welcomeInput"

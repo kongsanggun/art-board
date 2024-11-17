@@ -24,11 +24,11 @@ const ButtonInfo = styled.div`
   border-radius: 100%;
 `;
 
-const Title = ({title}: {title: String}) => {
+const Title = ({title, handler}: {title: String, handler: any}) => {
   return (
     <TitleRow>
       <span>{title}</span>
-      <ButtonInfo/>
+      <ButtonInfo onClick={handler}/>
     </TitleRow>
   )
 }
