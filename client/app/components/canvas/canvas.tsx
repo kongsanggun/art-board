@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import '../../App.css';
+import '../../page.module.css';
 import './canvas.css'
 import { Pixel } from '../../util/pixel';
 

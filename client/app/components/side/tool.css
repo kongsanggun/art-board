@@ -1,0 +1,18 @@
+.toolTitle {
+  width: fit-content;
+  height: fit-content;
+
+  font-size: 1.25rem;
+  margin: 0.5rem 0 0.5rem 0;
+}
+
+.toolDiv {
+  width: 100%;
+  height: 2.5rem;
+
+  background-color: #cecece;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}

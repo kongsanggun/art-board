@@ -1,6 +1,4 @@
-import styled from 'styled-components';
-
-const TitleRow = styled.div`
+.titleRow {
   width: 100%;
   height: fit-content;
   font-size: 1.75rem;
@@ -12,9 +10,9 @@ const TitleRow = styled.div`
   justify-content: space-between;
   align-content: center;
   align-items: center;
-`;
+}
 
-const ButtonInfo = styled.div`
+.buttonInfo {
   width: 1.75rem;
   height: 1.75rem;
   background-color: #c5c5c5;
@@ -22,15 +20,4 @@ const ButtonInfo = styled.div`
   font-size: 1rem;
 
   border-radius: 100%;
-`;
-
-const Title = ({title, handler}: {title: String, handler: any}) => {
-  return (
-    <TitleRow>
-      <span>{title}</span>
-      <ButtonInfo onClick={handler}/>
-    </TitleRow>
-  )
 }
-
-export default Title;

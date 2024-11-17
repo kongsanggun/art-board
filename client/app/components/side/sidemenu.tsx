@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import '../../App.css';
+import '../../page.module.css';
 import './sidemenu.css';
 
 import { Pixel } from '../../util/pixel';
@@ -10,7 +10,7 @@ import Title from './title';
 import UserList from './userList';
 import Info from '../popup/info';
 
-const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: String[], toggleEvent: any, pixelData: Pixel, handler: any}) => {
+const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: string[], toggleEvent: any, pixelData: Pixel, handler: any}) => {
     const [history, setHistory] = useState(pixelData.colorHistory);
     const [infoPop, setInfoPop] = useState(false);
 

@@ -1,5 +1,7 @@
+"use client"
+
 import { useEffect, useRef, useState } from 'react';
-import './App.css';
+import './page.module.css';
 
 import Sidemenu from './components/side/sidemenu';
 import Canvas from './components/canvas/canvas';
@@ -12,7 +14,7 @@ import ShortCut from './components/shortcut/shortcut';
 function App() {
 
     const [userName, setUserName] = useState('');
-    const [userList, setUserList] = useState<String[]>([]);
+    const [userList, setUserList] = useState<string[]>([]);
     const [welcome, setWelcome] = useState(true);
     const [toggle, setToggle] = useState(false);
 
@@ -49,21 +51,21 @@ function App() {
             socket.current?.emit("enter", name);
         });
 
-        socket.current.on("enter", (data) => {
+        socket.current.on("enter", (data : any) => {
             setEnterToggle(true);
             setMassage(data.userList[data.userList.length - 1] + "님이 입장하셨습니다.");
             setTimeout(() => {setEnterToggle(false)}, 1500);
             setUserList(data.userList);
         })
 
-        socket.current.on("left", (data) => {
+        socket.current.on("left", (data : any) => {
             setEnterToggle(true);
             setMassage(data.name + "님이 퇴장하셨습니다.");
             setTimeout(() => {setEnterToggle(false)}, 1500);
             setUserList(data.userList);
         })
 
-        socket.current.on("pixel", (data) => {
+        socket.current.on("pixel", (data : any) => {
             const canvas: any = document.getElementById("canvas");
             const ctx = canvas.getContext("2d");
 
@@ -76,7 +78,7 @@ function App() {
             }
         })
 
-        socket.current.on("draw", (data) => {
+        socket.current.on("draw", (data : any) => {
             const canvas: any = document.getElementById("canvas");
             const ctx = canvas.getContext("2d");
 
@@ -87,7 +89,7 @@ function App() {
             ctx.fillRect(pointX, pointY, data.data.brashSize, data.data.brashSize);
         })
 
-        socket.current.on("clear", (data) => {
+        socket.current.on("clear", (data : any) => {
             const canvas: any = document.getElementById("canvas");
             const ctx = canvas.getContext("2d");
 
