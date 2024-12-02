@@ -8,9 +8,9 @@ import {
 import { Socket, Server } from 'socket.io';
 
 interface Pixel {
-  RGB: string;
+  color: string;
   location: string;
-  user: string;
+  userName: string;
   brashSize: string;
   timestamp: string;
 }
@@ -81,9 +81,10 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('pen')
   async drawPixels(socket: Socket, data: Pixel): Promise<void> {
     // 정보를 저장한다.
+    console.log(data);
     const roomID = this.randomRoomID;
     this.pixels[roomID].set(data.location, data);
-    this.server.to(roomID).emit('pen', { roomID, data });
+    this.server.to(roomID).emit('draw', { roomID, data });
   }
 
   @SubscribeMessage('erase')
@@ -102,6 +103,6 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }
 
-    this.server.to(roomID).emit('erase', { roomID, data });
+    this.server.to(roomID).emit('clear', { roomID, data });
   }
 }

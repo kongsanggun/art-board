@@ -1,3 +1,7 @@
+.popupBack {
+  font-family: 'NanumBarunGothicLight';
+}
+
 .pageTitle {
   width: 100dvw;
   height: auto;
@@ -35,55 +39,10 @@
   font-size: 1.25rem;
 }
 
-.cousor{
-  border: 1px solid rgba(58, 58, 58, 0.35);
-  background: rgba(255, 255, 255, 0);
-  position: fixed;
-  z-index: 9;
-  height: 5px;
-  width: 5px;
-  cursor: none;
-  pointer-events:none;
-}
-
 .blur {
   filter: blur(5px);
   -webkit-filter: blur(5px);
   position: fixed;
-}
-
-.toggle {
-  width: 40dvw;
-  height: 4rem;
-
-  border-radius: 1rem;
-  border: #545454 2px solid;
-  background-color: #cfcfcf;
-
-  font-size: 1.5rem;
-  font-weight: 700;
-
-  top: 2.5dvh;
-  left: 30dvw;
-
-  position: fixed;
-
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  align-items: center;
-}
-
-@media screen and (max-width: 767px) {
-  .cousor {
-    display: none;
-  }
-}
-
-@media screen and (min-width : 768px) {
-  .cousor {
-    display: block;
-  }
 }
 
 @keyframes hoverWidth {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import './shortcut.css';
 
-import { Pixel } from '../../util/pixel';
+import { Pixel } from '../../module/types/pixel';
 
 const ShortCut = ({toggleEvent, pixelData, handler}: {toggleEvent: any, pixelData: Pixel, handler: any}) => {
     const [history, setHistory] = useState(pixelData.colorHistory);

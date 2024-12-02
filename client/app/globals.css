@@ -1,15 +1,3 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 html,
 body {
   max-width: 100vw;
@@ -35,8 +23,25 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+.cousor{
+  border: 1px solid rgba(58, 58, 58, 0.35);
+  background: rgba(255, 255, 255, 0);
+  position: fixed;
+  z-index: 100;
+  height: 5px;
+  width: 5px;
+  cursor: none;
+  pointer-events:none;
+}
+
+@media screen and (max-width: 767px) {
+  .cousor {
+    display: none;
+  }
+}
+
+@media screen and (min-width : 768px) {
+  .cousor {
+    display: block;
   }
 }

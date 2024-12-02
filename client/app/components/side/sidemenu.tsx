@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import '../../page.module.css';
+import '@/app/room/[id]/page.css';
 import './sidemenu.css';
 
 import { Pixel } from '../../util/pixel';

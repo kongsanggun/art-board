@@ -21,6 +21,8 @@
 }
 
 .popup {
+  font-family: 'BarunGothic';
+  
   position: fixed;
   z-index: 20;
   background: white;

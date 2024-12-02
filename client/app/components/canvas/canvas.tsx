@@ -1,9 +1,9 @@
 import { useRef } from 'react';
-import '../../page.module.css';
+import '@/app/room/[id]/page.css';
 import './canvas.css'
-import { Pixel } from '../../util/pixel';
+import { Pixel } from '../../module/types/pixel';
 
-const Canvas = ({ pixelData, sendHanlder }: {pixelData: Pixel, sendHanlder: any}) => {
+const Canvas = ({ pixelData, sendHanlder }: {pixelData: Pixel, sendHanlder: (data: string) => void}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     let pointX = -1;
@@ -11,9 +11,12 @@ const Canvas = ({ pixelData, sendHanlder }: {pixelData: Pixel, sendHanlder: any}
     let prvPoint = [-1, -1];
 
     // 캔버스 그리기 
-    const draw = (e: any) => {
-        const canvas: any = document.getElementById("canvas");
+    const draw = (e: MouseEvent) => {
+        const canvas = document.getElementById("canvas") as HTMLCanvasElement;
         const ctx = canvas.getContext("2d");
+
+        if(ctx === null) return;
+        if(e.target === null) return;
 
         ctx.fillStyle = pixelData.color;
 
@@ -65,7 +68,7 @@ const Canvas = ({ pixelData, sendHanlder }: {pixelData: Pixel, sendHanlder: any}
     }
 
     // 캔버스 이동하기
-    const drawMove = (e: any) => {
+    const drawMove = (e: unknown) => {
         if(pixelData.tool === "move") return;
         if (prvPoint[0] > 0 && prvPoint[1] > 0) {
             draw(e)
@@ -73,7 +76,7 @@ const Canvas = ({ pixelData, sendHanlder }: {pixelData: Pixel, sendHanlder: any}
     }
 
     // 캔버스 포인터 떼기 
-    const drawUp = (e: any) => {
+    const drawUp = () => {
         prvPoint = [-1, -1];
     }
 
@@ -84,9 +87,9 @@ const Canvas = ({ pixelData, sendHanlder }: {pixelData: Pixel, sendHanlder: any}
     }
 
     // 포인터가 캔버스에 떠났을 경우
-    const drawLeave = (e: any) => {
+    const drawLeave = () => {
         if(pixelData.tool === "move") return;
-        drawUp(e)
+        drawUp()
     }
 
     return (

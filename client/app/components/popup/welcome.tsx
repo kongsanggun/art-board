@@ -1,7 +1,9 @@
+"use client"
+
 import React, { useState } from "react";
 import './welcome.css';
 
-const Welcome = ({ onOpenAlert }: { onOpenAlert: any }) => {
+const Welcome = ({ room, onOpenAlert }: { room: any, onOpenAlert: any }) => {
     const [text, setText] = useState('');
     const [error, setError] = useState(false);
 
@@ -21,8 +23,9 @@ const Welcome = ({ onOpenAlert }: { onOpenAlert: any }) => {
         <div className="popupBack">
             <div className="popupEmpty"> </div>
             <div className="popup">
-                <h1>사이버 방문록에 오신 것을 환영합니다.</h1>
+                <h1>{room.name}에 오신 것을 환영합니다.</h1>
                 <p>방문록 내용</p>
+                <p>{room.detail}</p>
                 <p>아래의 닉네임을 입력해주시고 입장해주세요</p>
                 <input id="userName"
                         className="welcomeInput"
