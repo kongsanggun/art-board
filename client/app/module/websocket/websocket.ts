@@ -35,15 +35,14 @@ export class boardSocket {
   }
 
   on = () => {
-    console.log(this.socket)
     for(const key of Object.keys(this.afterFunction)) {
       this.socket.on(key, this.afterFunction[key])
     }
   }
 
   emit = (pixelData : Pixel) => {
-    // TODO : 소켓이 불러와지지 않는 오류 고쳐야함
     const massge = pixelData.tool;
+    console.log(massge)
     const param = {
         "color": pixelData.color,
         "location": pixelData.location,
@@ -51,8 +50,6 @@ export class boardSocket {
         "brashSize": pixelData.brashSize,
         "timestamp": "null"
     };
-    console.log(this.socket)
     this.socket.emit(massge, param);
   }
-
 }

@@ -5,7 +5,7 @@ const Tool = ({title, children}: {title: string, children: ReactNode}) => {
   return (
     <>
       <div className='toolTitle'>{title}</div>
-      <div className='toolDiv'>{children}</div>
+      <div className='toolDetail'>{children}</div>
     </>
   )
 }

@@ -1,21 +1,23 @@
-import { useEffect, useState } from 'react';
+import { FocusEvent, useEffect, useState } from 'react';
 
 import '@/app/room/[id]/page.css';
 import './sidemenu.css';
 
-import { Pixel } from '../../util/pixel';
+import { RoomData } from '@/app/module/types/room';
+import { Pixel } from '@/app/module/types/pixel';
 
 import Tool from './tool';
 import Title from './title';
 import UserList from './userList';
 import Info from '../popup/info';
 
-const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: string[], toggleEvent: any, pixelData: Pixel, handler: any}) => {
+
+const Sidemenu = ({room, userList, toggleEvent, pixelData, handler}: {room: RoomData, userList: string[], toggleEvent: () => void, pixelData: Pixel, handler: (value: Pixel) => void}) => {
     const [history, setHistory] = useState(pixelData.colorHistory);
     const [infoPop, setInfoPop] = useState(false);
 
     useEffect(() => {
-        const color = document.querySelector('#color') as any;
+        const color = document.querySelector('#color') as HTMLInputElement;
         color.value = pixelData.color;
 
         const tool = document.querySelector('#tool > #' + pixelData.tool) as HTMLElement
@@ -26,17 +28,17 @@ const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: string
     }, [pixelData.brashSize, pixelData.color, pixelData.tool])
 
     // 색 변경 적용
-    const colorChange = (e : any) => {
-        history.push(e.target.value as string);
+    const colorChange = (e : FocusEvent) => {
+        history.push((e.target as HTMLInputElement).value as string);
         setHistory(history.slice(-4));
 
-        pixelData.color = e.target.value as string
+        pixelData.color = (e.target as HTMLInputElement).value as string
         pixelData.colorHistory = history
         handler(pixelData)
     }
 
     const ColorHisChange = (value : string) => {
-        const color = document.querySelector('#color') as any;
+        const color = document.querySelector('#color') as HTMLInputElement;
         color.value = value
         pixelData.color = value;
         handler(pixelData)
@@ -62,11 +64,11 @@ const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: string
         handler(pixelData)
     }
 
-    const brashChange = (e : any) => {
-        const value = e.target.id.replace("size_", "");
+    const brashChange = (e : React.MouseEvent<HTMLElement, MouseEvent>) => {
+        const value = (e.target as HTMLInputElement).id.replace("size_", "");
 
         document.querySelectorAll('.brashSize').forEach((item) => {
-            item.className = item.className.replace(' btn_active', '')
+            item.className = item.className.replace('btn_active', '')
         })
         const active = document.querySelector('#size_' + value) as HTMLElement
         active.className += ' btn_active';
@@ -82,11 +84,11 @@ const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: string
     }
 
     return (
-        <>
-            {infoPop? <Info onOpenAlert = {() => {setInfoPop(!infoPop)}}/> : null}
+        <div className="sideBack">
+            {infoPop? <Info room = {room} onOpenAlert = {() => {setInfoPop(!infoPop)}}/> : null}
             <div className='sideCloseButton' onClick={toggleEvent}/>
             <div className='side'>
-                <Title title = {"사이버 방명록"} handler = {() => {setInfoPop(!infoPop)}}/>
+                <Title title = {room.name} handler = {() => {setInfoPop(!infoPop)}}/>
                 <div className="sideTool">
                     <Tool title="도구">
                         <div id="tool" className="toolDiv">
@@ -102,18 +104,16 @@ const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: string
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
                                 <path d="M290.7 57.4L57.4 290.7c-25 25-25 65.5 0 90.5l80 80c12 12 28.3 18.7 45.3 18.7L288 480l9.4 0L512 480c17.7 0 32-14.3 32-32s-14.3-32-32-32l-124.1 0L518.6 285.3c25-25 25-65.5 0-90.5L381.3 57.4c-25-25-65.5-25-90.5 0zM297.4 416l-9.4 0-105.4 0-80-80L227.3 211.3 364.7 348.7 297.4 416z"/></svg>
                             </button>
-                        </div>
-                        <div>
                             <input id='color' className="toolButton" type="color" onBlur={colorChange}/>
-                        </div>        
+                        </div>     
                     </Tool>
                     <Tool title="색상 이력">
                         {
-                            pixelData.colorHistory.map((item) => {return(<button key="" className = "historyButton" style={{ background: item }} onClick={() => {ColorHisChange(item)}}> </button>)})
+                            pixelData.colorHistory.map((item, index) => {return(<button key={index} className = "historyButton" style={{ background: item }} onClick={() => {ColorHisChange(item)}}> </button>)})
                         }
                     </Tool>
                     <Tool title="브러시 크기">
-                        <div id="brash">
+                        <div id="brash" className="toolDiv">
                             <button id = "size_7" className = "brashSize" onClick={brashChange}> 큼 </button>
                             <button id = "size_5" className = "brashSize" onClick={brashChange}> 보통 </button>
                             <button id = "size_3" className = "brashSize" onClick={brashChange}> 작음 </button>
@@ -122,7 +122,7 @@ const Sidemenu = ({userList, toggleEvent, pixelData, handler}: {userList: string
                 </div>
                 <UserList userList = {userList} />
             </div>
-        </>
+        </div>
     ) 
 }
 

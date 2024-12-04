@@ -1,7 +1,9 @@
 .titleRow {
   width: 100%;
   height: fit-content;
-  font-size: 1.75rem;
+
+  font-size: 1.5rem;
+  font-weight: 700;
 
   margin-bottom: 1rem;
 
@@ -15,9 +17,19 @@
 .buttonInfo {
   width: 1.75rem;
   height: 1.75rem;
-  background-color: #c5c5c5;
-
-  font-size: 1rem;
+  border: 0px solid rgb(148, 163, 184);
+  background-color: rgba(225,227,236);
 
   border-radius: 100%;
+  
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+}
+.buttonInfo:hover{
+  border: 0px solid rgb(59, 79, 121);
+  background-color: rgb(123, 126, 132);
+  color: rgb(248, 249, 252);
 }

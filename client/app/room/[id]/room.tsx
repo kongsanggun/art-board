@@ -11,7 +11,7 @@ import Welcome from '../../components/popup/welcome';
 import Canvas from '../../components/canvas/canvas';
 import Sidemenu from '../../components/side/sidemenu';
 import ShortCut from '../../components/shortcut/shortcut';
-import EnterToggle from '../../components/toggle/enter';
+import EnterToggle from '../../components/toggle/enterToggle';
 
 import {boardSocket} from '../../module/websocket/websocket'
 import { RoomData } from '@/app/module/types/room';
@@ -19,18 +19,19 @@ import { RoomData } from '@/app/module/types/room';
 export default function Room ({room}: {room: RoomData}) {
     const afterFunction = {
         enter : (responce : SocketResponce) => {
-            console.log(responce)
             const userList = responce.userList;
             setEnterToggle(true);
-            setMassage(userList[userList.length - 1] + "님이 입장하셨습니다.");
-            setTimeout(() => {setEnterToggle(false)}, 1500);
+            setToggleName(userList[userList.length - 1]);
+            setToggleMassage("님이 입장하셨습니다.");
             setUserList(userList);
+            setTimeout(() => {setEnterToggle(false)}, 1500);
         },
         left : (responce : SocketResponce) => {
             setEnterToggle(true);
-            setMassage(responce.name + "님이 퇴장하셨습니다.");
-            setTimeout(() => {setEnterToggle(false)}, 1500);
+            setToggleName(responce.name + "");
+            setToggleMassage("님이 퇴장하셨습니다.");
             setUserList(responce.userList);
+            setTimeout(() => {setEnterToggle(false)}, 1500);
         },
         pixel : (responce : SocketResponce) => {
             const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -60,6 +61,7 @@ export default function Room ({room}: {room: RoomData}) {
             ctx.fillRect(pointX, pointY, Number(data.brashSize), Number(data.brashSize));
         },
         clear : (responce : SocketResponce) => {
+            console.log("clear")
             const data = responce.data;
             const canvas = document.getElementById("canvas") as HTMLCanvasElement;
             const ctx = canvas.getContext("2d");
@@ -81,12 +83,12 @@ export default function Room ({room}: {room: RoomData}) {
     const [enterToggle, setEnterToggle] = useState(true);
     const [sideToggle, setSideToggle] = useState(false);
 
-    const [massage, setMassage] = useState('');
+    const [toggleName, setToggleName] = useState('');
+    const [toggleMassage, setToggleMassage] = useState('');
 
     const closeAction = (name: string) => {
         setWelcomePopup(false)
         socket.current.open(name)
-        console.log(socket)
         window.addEventListener('mousemove', animateCursor)
     }
 
@@ -107,8 +109,8 @@ export default function Room ({room}: {room: RoomData}) {
     }
 
     const emitPixel = (location: string) => {
-        console.log(socket)
         pixelData.location = location
+        console.log(pixelData)
         socket.current.emit(pixelData)
     }
 
@@ -118,12 +120,12 @@ export default function Room ({room}: {room: RoomData}) {
                 welcomePopup ? <Welcome room = {room} onOpenAlert = {(name: string) => {closeAction(name)}}/> :
                 <div className = {welcomePopup ? 'blur' : ''}>
                     {
-                        enterToggle ? <EnterToggle massage = {massage}/>: null
+                        enterToggle ? <EnterToggle name = {toggleName} massage = {toggleMassage}/>: null
                     }
                     <div className="cousor"></div>
                     {
                         sideToggle 
-                        ? <Sidemenu toggleEvent = {sideToggleEvent} pixelData = {pixelData} handler = {setPixelHandler} userList = {userList}/> 
+                        ? <Sidemenu room = {room} toggleEvent = {sideToggleEvent} pixelData = {pixelData} handler = {setPixelHandler} userList = {userList}/> 
                         : <ShortCut toggleEvent = {sideToggleEvent} pixelData = {pixelData} handler = {setPixelHandler}/>
                     }
                     <Canvas pixelData = {pixelData} sendHanlder = {emitPixel}/>

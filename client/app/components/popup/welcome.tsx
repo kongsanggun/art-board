@@ -1,9 +1,11 @@
 "use client"
 
 import React, { useState } from "react";
+import { RoomData } from "@/app/module/types/room";
+
 import './welcome.css';
 
-const Welcome = ({ room, onOpenAlert }: { room: any, onOpenAlert: any }) => {
+const Welcome = ({ room, onOpenAlert }: { room: RoomData, onOpenAlert: (arg: string) => void}) => {
     const [text, setText] = useState('');
     const [error, setError] = useState(false);
 
@@ -23,20 +25,24 @@ const Welcome = ({ room, onOpenAlert }: { room: any, onOpenAlert: any }) => {
         <div className="popupBack">
             <div className="popupEmpty"> </div>
             <div className="popup">
-                <h1>{room.name}에 오신 것을 환영합니다.</h1>
-                <p>방문록 내용</p>
-                <p>{room.detail}</p>
-                <p>아래의 닉네임을 입력해주시고 입장해주세요</p>
-                <input id="userName"
+                <h1>{room.name}의 방명록</h1>
+                <div className="detail">
+                    {room.detail}
+                </div>
+                <div className="inputDiv">
+                    <p><b>닉네임</b>을 입력해주세요.</p>
+                    <input id="userName"
                         className="welcomeInput"
                         type="text"
                         value={text}
                         maxLength={20}
                         onChange={handleChange}
-                        placeholder="사용자 이름 입력하기"></input>
+                        placeholder="사용자 이름"></input>
+                </div>
+
                 <div>
+                {error ? <p className="error">이름을 입력해주세요!</p> : <p className="error"> </p>}
                 <button className="welcomeButton" onClick={start}> 시작하기 </button>
-                {error ? <p className="error">이름을 입력해주세요!</p> : null}
                 </div>
             </div>
         </div>

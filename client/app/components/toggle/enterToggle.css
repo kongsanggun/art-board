@@ -1,0 +1,60 @@
+.line {
+  width: 100dvw;
+  height: 4rem;
+
+  top: 2.5dvh;
+  position: fixed;
+
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+
+.toggle {
+  width: 480px;
+  height: 4rem;
+  border-radius: 1rem;
+  
+  color: #212121;
+  background-color: #dddee4;
+
+  font-size: 1.5rem;
+  font-weight: 400;
+
+  position: fixed;
+
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+
+  animation-name: fadeOut;
+  animation-delay: 1000ms;
+  animation-duration: 0.45s;
+  animation-fill-mode: both;
+}
+
+.name {
+  font-weight: 700;
+}
+
+@keyframes fadeOut {
+  0% { 
+    background-color: #EDEEF4;
+    color: #212121;
+  }
+  100% { 
+    background-color: rgba(59, 79, 121, 0);
+    color: rgba(0, 0, 0, 0);
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .toggle {
+    width: 330px;
+    height: 3rem;
+
+    font-size: 1rem;
+  }
+}

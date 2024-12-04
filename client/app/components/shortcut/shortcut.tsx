@@ -1,14 +1,16 @@
-import { useEffect, useState } from 'react';
+"use client"
+
+import { FocusEvent, useEffect, useState } from 'react';
+import { Pixel } from '../../module/types/pixel';
 
 import './shortcut.css';
 
-import { Pixel } from '../../module/types/pixel';
 
-const ShortCut = ({toggleEvent, pixelData, handler}: {toggleEvent: any, pixelData: Pixel, handler: any}) => {
+const ShortCut = ({toggleEvent, pixelData, handler}: {toggleEvent: () => void, pixelData: Pixel, handler: (value: Pixel) => void}) => {
     const [history, setHistory] = useState(pixelData.colorHistory);
 
     useEffect(() => {
-        const color = document.querySelector('#color') as any;
+        const color = document.querySelector('#color') as HTMLInputElement;
         color.value = pixelData.color;
 
         const tool = document.querySelector('#tool > #' + pixelData.tool) as HTMLElement
@@ -16,11 +18,11 @@ const ShortCut = ({toggleEvent, pixelData, handler}: {toggleEvent: any, pixelDat
     }, [pixelData.color, pixelData.tool])
 
     // 색 변경 적용
-    const colorChange = (e : any) => {
-        history.push(e.target.value as string);
+    const colorChange = (e : FocusEvent) => {
+        history.push((e.target as HTMLInputElement).value as string);
         setHistory(history.slice(-4));
 
-        pixelData.color = e.target.value as string
+        pixelData.color = (e.target as HTMLInputElement).value as string
         pixelData.colorHistory = history
         handler(pixelData)
     }
@@ -51,7 +53,7 @@ const ShortCut = ({toggleEvent, pixelData, handler}: {toggleEvent: any, pixelDat
             <div id="tool" className="shortcut">
                 <button id="move" className="shortcutButton" onClick={() => {ToolChange("move")}}> 
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                    <path d="M278.6 9.4c-12.5-12.5-32.8-12.5-45.3 0l-64 64c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l9.4-9.4L224 224l-114.7 0 9.4-9.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-64 64c-12.5 12.5-12.5 32.8 0 45.3l64 64c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-9.4-9.4L224 288l0 114.7-9.4-9.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l64 64c12.5 12.5 32.8 12.5 45.3 0l64-64c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-9.4 9.4L288 288l114.7 0-9.4 9.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l64-64c12.5-12.5 12.5-32.8 0-45.3l-64-64c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l9.4 9.4L288 224l0-114.7 9.4 9.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-64-64z"/></svg> 
+                    <path d="M278.6 9.4c-12.5-12.5-32.8-12.5-45.3 0l-64 64c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l9.4-9.4L224 224l-114.7 0 9.4-9.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-64 64c-12.5 12.5-12.5 32.8 0 45.3l64 64c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-9.4-9.4L224 288l0 114.7-9.4-9.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l64 64c12.5 12.5 32.8 12.5 45.3 0l64-64c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-9.4 9.4L288 288l114.7 0-9.4 9.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l64-64c12.5-12.5 12.5-32.8 0-45.3l-64-64c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l9.4 9.4L288 224l0-114.7 9.4 9.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-64-64z"/></svg>
                 </button>
                 <button id="pen" className="shortcutButton" onClick={() => {ToolChange("pen")}}> 
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">

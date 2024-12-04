@@ -5,7 +5,7 @@
   z-index: 10;
   height: 4rem;
   width: 1rem;
-  background-color: #cfcfcf;
+  background-color: rgb(123, 126, 132);
 
   border-top-right-radius: 1rem;
   border-bottom-left-radius: 0;
@@ -19,11 +19,9 @@
 
   height: 3rem;
   width: 12rem;
-
-  border-top: 2px #b2b0b0 solid;
-  border-left: 2px #b2b0b0 solid;
+  
+  border: 2px rgb(123, 126, 132) solid;
   border-right: 0px;
-  border-bottom: 2px #b2b0b0 solid;
 
   display: flex;
   flex-direction: row;
@@ -36,27 +34,33 @@
   width: 3rem;
   height: 3rem;
 
+  padding: 2px;
+
   border: 0px;
-  border-right: 2px #b2b0b0 solid;
+  border-right: 2px rgb(123, 126, 132) solid;
 
-  color: #b2b0b0;
+  background: rgba(0, 0, 0, 0);
+  fill: rgb(123, 126, 132);
 
-  background-color: rgba(255, 255, 255, 1);
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
 }
 
 .shortcutButton:hover{
-  color: #212121;
-  background: #b2b0b0;
+  fill: #212121;
+  background: rgb(123, 126, 132);
 }
 
 .shortcutButton:active{
-  color: #212121;
-  background: #b2b0b0;
+  fill: #212121;
+  background: rgb(123, 126, 132);
 }
 
 .shortcutButton_active {
-  color: #545454;
-  background: #b2b0b0;
+  fill: #EDEEF4;
+  background: rgb(123, 126, 132);
 }
 
 @media screen and (max-width: 767px) {
@@ -79,7 +83,7 @@
   }
 
   .shortcut {
-    border-right: 2px #b2b0b0 solid;
+    border-right: 2px rgb(123, 126, 132) solid;
   }
 }
 
