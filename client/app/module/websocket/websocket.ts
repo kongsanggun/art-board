@@ -16,7 +16,7 @@ export class boardSocket {
       throw Error("소켓 연결 주소가 없음");
     }
 
-    this.socket = io(process.env.NEXT_PUBLIC_REACT_APP_URL, {
+    this.socket = io(`${process.env.NEXT_PUBLIC_REACT_APP_URL}`, {
       transports: ['websocket'], 
       autoConnect: false,
     })
@@ -24,11 +24,11 @@ export class boardSocket {
     this.afterFunction = afterFunction;
   }
 
-  open = (name : string) => {
+  open = (name : string, roomId: string) => {
     if(this.socket.disconnect()) {
       this.socket.open();
       this.socket.on("connect", () => {
-        this.socket.emit("enter", name);
+        this.socket.emit("enter", {name : name, roomId : roomId});
     });
     }
     this.on();
@@ -42,7 +42,6 @@ export class boardSocket {
 
   emit = (pixelData : Pixel) => {
     const massge = pixelData.tool;
-    console.log(massge)
     const param = {
         "color": pixelData.color,
         "location": pixelData.location,

@@ -66,10 +66,10 @@ const Sidemenu = ({room, userList, toggleEvent, pixelData, handler}: {room: Room
 
     const brashChange = (e : React.MouseEvent<HTMLElement, MouseEvent>) => {
         const value = (e.target as HTMLInputElement).id.replace("size_", "");
-
         document.querySelectorAll('.brashSize').forEach((item) => {
-            item.className = item.className.replace('btn_active', '')
+            item.className = item.className.replaceAll(' btn_active', '')
         })
+
         const active = document.querySelector('#size_' + value) as HTMLElement
         active.className += ' btn_active';
 

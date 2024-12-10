@@ -1,11 +1,16 @@
 import { Module } from '@nestjs/common';
 import { SocketModule } from './modules/socket/socket.module';
 import { RoomModule } from './room/room.module';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Room } from './database/entity/room.entity';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: `.env`,
+      isGlobal: true,
+    }),
     SocketModule,
     RoomModule,
     TypeOrmModule.forRoot({

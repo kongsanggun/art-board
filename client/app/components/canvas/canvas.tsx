@@ -40,20 +40,19 @@ const Canvas = ({ pixelData, sendHanlder }: {pixelData: Pixel, sendHanlder: (dat
         const steps = Math.max(Math.abs(dx), Math.abs(dy));
         const xinc = dx / steps, yinc = dy / steps;
 
-        if (steps <= 50) {
-            for (let i = 0; i < steps; i++) {
-                x0 += xinc;
-                y0 += yinc;
-                const x1 = Math.round(x0);
-                const y1 = Math.round(y0);
+        for (let i = 0; i < steps; i++) {
+            x0 += xinc;
+            y0 += yinc;
+            const x1 = Math.round(x0);
+            const y1 = Math.round(y0);
+
+            if (pixelData.tool === "erase") {
     
-                if (pixelData.tool === "erase") {
-                    ctx.clearRect(x1, y1, pixelData.brashSize, pixelData.brashSize);
-                    sendHanlder(x1 + ',' + y1);
-                } else {
-                    ctx.fillRect(x1, y1, pixelData.brashSize, pixelData.brashSize);
-                    sendHanlder(x1 + ',' + y1);
-                }
+                ctx.clearRect(x1, y1, pixelData.brashSize, pixelData.brashSize);
+                sendHanlder(x1 + ',' + y1);
+            } else {
+                ctx.fillRect(x1, y1, pixelData.brashSize, pixelData.brashSize);
+                sendHanlder(x1 + ',' + y1);
             }
         }
 

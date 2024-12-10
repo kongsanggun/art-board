@@ -19,8 +19,9 @@ interface Pixel {
 export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
-  // TODO : 추후 클래스로 변환 예정
-  randomRoomID: string = crypto.randomUUID();
+  user: { [key: string]: string } = {};
+  // 방 ID
+  roomList: { [key: string]: string } = {};
   // [socketId, name]
   userList: { [roomId: string]: Map<string, string> } = {};
   // [location, info]
@@ -33,7 +34,7 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // 소켓 연결 해제
   async handleDisconnect(socket: Socket): Promise<void> {
-    const roomID = this.randomRoomID;
+    const roomID = this.user[socket.id];
     const name = this.userList[roomID].get(socket.id);
     this.userList[roomID].delete(socket.id);
 
@@ -44,11 +45,19 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     this.server.to(roomID).emit('left', { roomID, userList, name });
     console.log(`Client ${socket.id} disconnected.`);
+    console.log(`Room ${roomID} disconnected.`);
   }
 
+  // 방 입장
   @SubscribeMessage('enter')
-  async enterRoom(socket: Socket, data: string): Promise<void> {
-    const roomID = this.randomRoomID;
+  async enterRoom(socket: Socket, data: any): Promise<void> {
+    if (this.roomList[data.roomId] === undefined) {
+      this.roomList[data.roomId] = crypto.randomUUID();
+    }
+
+    const roomID = this.roomList[data.roomId];
+    console.log(`Room ${roomID} connected.`);
+    this.user[socket.id] = roomID;
     if (socket.rooms.has(roomID)) {
       return;
     }
@@ -58,7 +67,7 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.pixels[roomID] = new Map<string, Pixel>();
     }
 
-    this.userList[roomID].set(socket.id, data);
+    this.userList[roomID].set(socket.id, data.name);
 
     const userList: string[] = [];
     const pixelData: Pixel[] = [];
@@ -69,25 +78,25 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(roomID).emit('enter', { roomID, userList });
     socket.join(roomID);
 
-    this.server.emit('enter', { roomID, userList });
+    this.server.to(roomID).emit('enter', { roomID, userList });
 
     for (const item of this.pixels[roomID].values()) {
       pixelData.push(item);
     }
 
-    this.server.emit('pixel', { roomID, pixelData });
+    this.server.to(roomID).emit('pixel', { roomID, pixelData });
   }
 
   @SubscribeMessage('pen')
   async drawPixels(socket: Socket, data: Pixel): Promise<void> {
-    const roomID = this.randomRoomID;
+    const roomID = this.user[socket.id];
     this.pixels[roomID].set(data.location, data);
     this.server.to(roomID).emit('draw', { roomID, data });
   }
 
   @SubscribeMessage('erase')
   async clearPixels(socket: Socket, data: Pixel): Promise<void> {
-    const roomID = this.randomRoomID;
+    const roomID = this.user[socket.id];
     const serachNumber = Number(data.brashSize);
 
     const [targetX, targetY] = data.location.split(',').map((v) => {

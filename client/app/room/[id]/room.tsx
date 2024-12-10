@@ -61,7 +61,6 @@ export default function Room ({room}: {room: RoomData}) {
             ctx.fillRect(pointX, pointY, Number(data.brashSize), Number(data.brashSize));
         },
         clear : (responce : SocketResponce) => {
-            console.log("clear")
             const data = responce.data;
             const canvas = document.getElementById("canvas") as HTMLCanvasElement;
             const ctx = canvas.getContext("2d");
@@ -71,7 +70,7 @@ export default function Room ({room}: {room: RoomData}) {
             const pointX = Number(data.location.split(',')[0])
             const pointY = Number(data.location.split(',')[1])
 
-            ctx.fillRect(pointX, pointY, Number(data.brashSize), Number(data.brashSize));
+            ctx.clearRect(pointX, pointY, Number(data.brashSize), Number(data.brashSize));
         }
     }
 
@@ -88,7 +87,7 @@ export default function Room ({room}: {room: RoomData}) {
 
     const closeAction = (name: string) => {
         setWelcomePopup(false)
-        socket.current.open(name)
+        socket.current.open(name, room.id)
         window.addEventListener('mousemove', animateCursor)
     }
 
@@ -110,7 +109,6 @@ export default function Room ({room}: {room: RoomData}) {
 
     const emitPixel = (location: string) => {
         pixelData.location = location
-        console.log(pixelData)
         socket.current.emit(pixelData)
     }
 
