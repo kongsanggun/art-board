@@ -8,9 +8,9 @@ export class Room {
   @Column()
   name: string;
 
-  @Column()
+  @Column('longtext')
   detail: string;
 
-  @Column()
+  @Column('longtext')
   data: string;
 }

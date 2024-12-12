@@ -6,6 +6,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { RoomService } from 'src/room/room.service';
 import Pixel from 'src/types/pixel';
 
 interface room {
@@ -52,6 +53,7 @@ interface enterReq {
 @WebSocketGateway(8080, { cors: { origin: '*' } })
 export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
+  constructor(private readonly roomService: RoomService) {}
 
   roomList: Map<string, room> = new Map<string, room>();
   userList: Map<string, user> = new Map<string, user>();
@@ -86,18 +88,21 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('enter')
   async enterRoom(socket: Socket, data: enterReq): Promise<void> {
     let room = this.roomList.get(data.roomId);
+    const userList: string[] = [];
+    let pixelData: Pixel[] = [];
+
     if (room === undefined) {
       const newRoomID = crypto.randomUUID();
       this.roomList.set(data.roomId, new Room(newRoomID.toString()));
       room = this.roomList.get(data.roomId);
+
+      const dbData = (await this.roomService.findRoom(data.roomId)).data;
+      pixelData = this.convertData(dbData);
     }
 
     console.log(`${data.roomId}'s Room ::: ${room.uuid} connected.`);
 
     const uuid = room.uuid;
-    const userList: string[] = [];
-    const pixelData: Pixel[] = [];
-
     if (socket.rooms.has(uuid)) {
       return;
     }
@@ -125,7 +130,10 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const uuid = room.uuid;
 
     room.pixelList.set(data.location, data);
-    // todo : 통합 DB 갱신하기
+
+    // todo : 통합 DB 갱신하기 (시간 개선 필요)
+    const dataStr = JSON.stringify(Array.from(room.pixelList.values()));
+    this.roomService.updatePixel(roomID, dataStr);
 
     this.server.to(uuid).emit('draw', { roomID: uuid, data });
   }
@@ -149,6 +157,21 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     // todo : 통합 DB 갱신하기
+    const dataStr = JSON.stringify(Array.from(room.pixelList.values()));
+    this.roomService.updatePixel(roomID, dataStr);
+
     this.server.to(roomID).emit('clear', { roomID: uuid, data });
+  }
+
+  private convertData(dbData: string): Pixel[] {
+    const result: Pixel[] = [];
+    const list = dbData.slice(1, -1).split('},');
+
+    for (const item of list.slice(0, -1)) {
+      const pixel = JSON.parse(item + '}');
+      result.push(pixel as Pixel);
+    }
+
+    return result;
   }
 }
