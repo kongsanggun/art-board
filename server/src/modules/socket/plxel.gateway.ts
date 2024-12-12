@@ -6,99 +6,137 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import Pixel from 'src/types/pixel';
 
-interface Pixel {
-  color: string;
-  location: string;
+interface room {
+  uuid: string;
+  userList: Map<string, user>;
+  pixelList: Map<string, Pixel>;
+  updateTime: string;
+}
+
+class Room implements room {
+  uuid: string;
+  userList: Map<string, user>;
+  pixelList: Map<string, Pixel>;
+  updateTime: string;
+
+  constructor(uuid: string) {
+    this.uuid = uuid;
+    this.userList = new Map<string, user>;
+    this.pixelList = new Map<string, Pixel>;
+    this.updateTime = new Date().toDateString();
+  }
+}
+
+interface user {
   userName: string;
-  brashSize: string;
-  timestamp: string;
+  roomId: string;
+}
+
+class User implements user {
+  userName: string;
+  roomId: string;
+
+  constructor(name: string, id: string) {
+    this.userName = name;
+    this.roomId = id;
+  }
+}
+
+interface enterReq {
+  roomId: string;
+  name: string;
 }
 
 @WebSocketGateway(8080, { cors: { origin: '*' } })
 export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
-  user: { [key: string]: string } = {};
-  // 방 ID
-  roomList: { [key: string]: string } = {};
-  // [socketId, name]
-  userList: { [roomId: string]: Map<string, string> } = {};
-  // [location, info]
-  pixels: { [roomId: string]: Map<string, Pixel> } = {};
+  roomList: Map<string, room> = new Map<string, room>();
+  userList: Map<string, user> = new Map<string, user>();
 
-  // 소켓 연결
+  // 소켓을 연결한다.
   async handleConnection(socket: Socket): Promise<void> {
     console.log(`Client ${socket.id} connected.`);
   }
 
   // 소켓 연결 해제
   async handleDisconnect(socket: Socket): Promise<void> {
-    const roomID = this.user[socket.id];
-    const name = this.userList[roomID].get(socket.id);
-    this.userList[roomID].delete(socket.id);
+    const roomID = this.userList.get(socket.id).roomId;
+    const room = this.roomList.get(roomID);
+    const name = this.userList.get(socket.id).userName;
+
+    console.log(`${roomID}'s Room ::: ${room.uuid} disconnected.`);
+
+    room.userList.delete(socket.id);
+    this.userList.delete(socket.id);
 
     const userList: string[] = [];
-    for (const item of this.userList[roomID].values()) {
-      userList.push(item);
+    for (const item of room.userList.values()) {
+      userList.push(item.userName);
     }
 
     this.server.to(roomID).emit('left', { roomID, userList, name });
+
     console.log(`Client ${socket.id} disconnected.`);
-    console.log(`Room ${roomID} disconnected.`);
   }
 
   // 방 입장
   @SubscribeMessage('enter')
-  async enterRoom(socket: Socket, data: any): Promise<void> {
-    if (this.roomList[data.roomId] === undefined) {
-      this.roomList[data.roomId] = crypto.randomUUID();
+  async enterRoom(socket: Socket, data: enterReq): Promise<void> {
+    let room = this.roomList.get(data.roomId);
+    if (room === undefined) {
+      const newRoomID = crypto.randomUUID();
+      this.roomList.set(data.roomId, new Room(newRoomID.toString()));
+      room = this.roomList.get(data.roomId);
     }
 
-    const roomID = this.roomList[data.roomId];
-    console.log(`Room ${roomID} connected.`);
-    this.user[socket.id] = roomID;
-    if (socket.rooms.has(roomID)) {
+    console.log(`${data.roomId}'s Room ::: ${room.uuid} connected.`);
+
+    const uuid = room.uuid;
+    const userList: string[] = [];
+    const pixelData: Pixel[] = [];
+
+    if (socket.rooms.has(uuid)) {
       return;
     }
 
-    if (!this.userList[roomID]) {
-      this.userList[roomID] = new Map<string, string>();
-      this.pixels[roomID] = new Map<string, Pixel>();
+    this.userList.set(socket.id, new User(data.name, data.roomId));
+    room.userList.set(socket.id, new User(data.name, data.roomId));
+
+    for (const item of room.userList.values()) {
+      userList.push(item.userName);
     }
 
-    this.userList[roomID].set(socket.id, data.name);
-
-    const userList: string[] = [];
-    const pixelData: Pixel[] = [];
-    for (const item of this.userList[roomID].values()) {
-      userList.push(item);
-    }
-
-    this.server.to(roomID).emit('enter', { roomID, userList });
-    socket.join(roomID);
-
-    this.server.to(roomID).emit('enter', { roomID, userList });
-
-    for (const item of this.pixels[roomID].values()) {
+    for (const item of room.pixelList.values()) {
       pixelData.push(item);
     }
 
-    this.server.to(roomID).emit('pixel', { roomID, pixelData });
+    socket.join(uuid);
+    this.server.to(uuid).emit('enter', { uuid, userList });
+    this.server.to(uuid).emit('pixel', { uuid, pixelData });
   }
 
   @SubscribeMessage('pen')
   async drawPixels(socket: Socket, data: Pixel): Promise<void> {
-    const roomID = this.user[socket.id];
-    this.pixels[roomID].set(data.location, data);
-    this.server.to(roomID).emit('draw', { roomID, data });
+    const roomID = this.userList.get(socket.id).roomId;
+    const room = this.roomList.get(roomID);
+    const uuid = room.uuid;
+
+    room.pixelList.set(data.location, data);
+    // todo : 통합 DB 갱신하기
+
+    this.server.to(uuid).emit('draw', { roomID: uuid, data });
   }
 
   @SubscribeMessage('erase')
   async clearPixels(socket: Socket, data: Pixel): Promise<void> {
-    const roomID = this.user[socket.id];
-    const serachNumber = Number(data.brashSize);
+    const roomID = this.userList.get(socket.id).roomId;
+    const room = this.roomList.get(roomID);
+    const uuid = room.uuid;
 
+    const serachNumber = Number(data.brashSize);
     const [targetX, targetY] = data.location.split(',').map((v) => {
       return Number(v);
     });
@@ -106,10 +144,11 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (let x = 0; x < serachNumber; x++) {
       for (let y = 0; y < serachNumber; y++) {
         const location = targetX + x + ',' + (targetY + y);
-        this.pixels[roomID].delete(location);
+        room.pixelList.delete(location);
       }
     }
 
-    this.server.to(roomID).emit('clear', { roomID, data });
+    // todo : 통합 DB 갱신하기
+    this.server.to(roomID).emit('clear', { roomID: uuid, data });
   }
 }

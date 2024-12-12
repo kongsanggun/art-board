@@ -23,4 +23,13 @@ export class RoomService {
 
     return result;
   }
+
+  async updatePixel(id: string, data: string): Promise<any> {
+    const result = await this.usersRepository.update(
+      { id: id },
+      { id: id, data: data },
+    );
+
+    return result;
+  }
 }
