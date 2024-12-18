@@ -1,3 +1,5 @@
+import { Injectable } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -24,8 +26,8 @@ class Room implements room {
 
   constructor(uuid: string) {
     this.uuid = uuid;
-    this.userList = new Map<string, user>;
-    this.pixelList = new Map<string, Pixel>;
+    this.userList = new Map<string, user>();
+    this.pixelList = new Map<string, Pixel>();
     this.updateTime = new Date().toDateString();
   }
 }
@@ -50,6 +52,7 @@ interface enterReq {
   name: string;
 }
 
+@Injectable()
 @WebSocketGateway(8080, { cors: { origin: '*' } })
 export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
@@ -70,16 +73,19 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const name = this.userList.get(socket.id).userName;
 
     console.log(`${roomID}'s Room ::: ${room.uuid} disconnected.`);
-
     room.userList.delete(socket.id);
     this.userList.delete(socket.id);
 
-    const userList: string[] = [];
-    for (const item of room.userList.values()) {
-      userList.push(item.userName);
+    if (room.userList.size === 0) {
+      console.log(`${roomID}'s Room is closed.`);
+      this.roomList.delete(roomID);
+    } else {
+      const userList: string[] = [];
+      for (const item of room.userList.values()) {
+        userList.push(item.userName);
+      }
+      this.server.to(roomID).emit('left', { roomID, userList, name });
     }
-
-    this.server.to(roomID).emit('left', { roomID, userList, name });
 
     console.log(`Client ${socket.id} disconnected.`);
   }
@@ -89,7 +95,7 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async enterRoom(socket: Socket, data: enterReq): Promise<void> {
     let room = this.roomList.get(data.roomId);
     const userList: string[] = [];
-    let pixelData: Pixel[] = [];
+    const pixelData: Pixel[] = [];
 
     if (room === undefined) {
       const newRoomID = crypto.randomUUID();
@@ -97,7 +103,8 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
       room = this.roomList.get(data.roomId);
 
       const dbData = (await this.roomService.findRoom(data.roomId)).data;
-      pixelData = this.convertData(dbData);
+      room.pixelList = this.convertData(dbData);
+      console.log(`${data.roomId}'s Room is open.`);
     }
 
     console.log(`${data.roomId}'s Room ::: ${room.uuid} connected.`);
@@ -114,8 +121,8 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
       userList.push(item.userName);
     }
 
-    for (const item of room.pixelList.values()) {
-      pixelData.push(item);
+    for (const pixel of room.pixelList.values()) {
+      pixelData.push(pixel);
     }
 
     socket.join(uuid);
@@ -130,11 +137,6 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const uuid = room.uuid;
 
     room.pixelList.set(data.location, data);
-
-    // todo : 통합 DB 갱신하기 (시간 개선 필요)
-    const dataStr = JSON.stringify(Array.from(room.pixelList.values()));
-    this.roomService.updatePixel(roomID, dataStr);
-
     this.server.to(uuid).emit('draw', { roomID: uuid, data });
   }
 
@@ -156,22 +158,28 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }
 
-    // todo : 통합 DB 갱신하기
-    const dataStr = JSON.stringify(Array.from(room.pixelList.values()));
-    this.roomService.updatePixel(roomID, dataStr);
-
     this.server.to(roomID).emit('clear', { roomID: uuid, data });
   }
 
-  private convertData(dbData: string): Pixel[] {
-    const result: Pixel[] = [];
+  private convertData(dbData: string): Map<string, Pixel> {
+    const result = new Map<string, Pixel>();
     const list = dbData.slice(1, -1).split('},');
 
     for (const item of list.slice(0, -1)) {
-      const pixel = JSON.parse(item + '}');
-      result.push(pixel as Pixel);
+      const pixel = JSON.parse(item + '}') as Pixel;
+      result.set(pixel.location, pixel);
     }
 
     return result;
+  }
+
+  @Cron('* * * * * *')
+  async pixelDateUpdate(): Promise<void> {
+    console.log(new Date().toUTCString() + ' ::: data update');
+    for (const roomID of this.roomList.keys()) {
+      const room = this.roomList.get(roomID);
+      const dataStr = JSON.stringify(Array.from(room.pixelList.values()));
+      this.roomService.updatePixel(roomID, dataStr);
+    }
   }
 }
