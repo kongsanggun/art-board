@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { PixelGateway } from './plxel.gateway';
 import { RoomService } from 'src/room/room.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Room } from 'src/database/entity/room.entity';
+import { Room } from 'src/database/entities/room.entity';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({

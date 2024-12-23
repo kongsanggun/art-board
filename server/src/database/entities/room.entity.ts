@@ -11,6 +11,9 @@ export class Room {
   @Column('longtext')
   detail: string;
 
-  @Column('longtext')
-  data: string;
+  @Column('int', { default: 20 })
+  limitUser: number;
+
+  @Column('longtext', { default: '{}' })
+  pixelData: string;
 }

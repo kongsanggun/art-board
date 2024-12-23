@@ -3,7 +3,7 @@ import { SocketModule } from './modules/socket/socket.module';
 import { RoomModule } from './room/room.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Room } from './database/entity/room.entity';
+import { Room } from './database/entities/room.entity';
 
 @Module({
   imports: [

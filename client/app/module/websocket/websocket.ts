@@ -9,7 +9,7 @@ type afterFunction = {
 
 export class boardSocket {
   socket: Socket;
-  afterFunction: object;
+  afterFunction: afterFunction;
 
   constructor(afterFunction: afterFunction) {
     if(process.env.NEXT_PUBLIC_REACT_APP_URL === '' || process.env.NEXT_PUBLIC_REACT_APP_URL === undefined) {

@@ -120,7 +120,7 @@ const Sidemenu = ({room, userList, toggleEvent, pixelData, handler}: {room: Room
                         </div>
                     </Tool>
                 </div>
-                <UserList userList = {userList} />
+                <UserList room = {room} userList = {userList} />
             </div>
         </div>
     ) 

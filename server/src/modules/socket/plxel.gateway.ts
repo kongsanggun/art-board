@@ -6,38 +6,33 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { SERVER_CONFIG } from 'src/configs/server.config';
 import { RoomService } from 'src/room/room.service';
-import Pixel from 'src/types/pixel';
+import EnterReq from 'src/types/enter-req.type';
 
-interface room {
-  uuid: string;
-  userList: Map<string, user>;
-  pixelList: Map<string, Pixel>;
-  updateTime: string;
-}
+import Pixel from 'src/types/pixel.type';
+import Room from 'src/types/room.type';
+import User from 'src/types/user.type';
 
-class Room implements room {
+class roomClass implements Room {
   uuid: string;
-  userList: Map<string, user>;
+  userList: Map<string, User>;
   pixelList: Map<string, Pixel>;
+  limitUser: number;
   updateTime: string;
 
   constructor(uuid: string) {
     this.uuid = uuid;
-    this.userList = new Map<string, user>();
+    this.userList = new Map<string, User>();
     this.pixelList = new Map<string, Pixel>();
     this.updateTime = new Date().toDateString();
   }
 }
 
-interface user {
-  userName: string;
-  roomId: string;
-}
-
-class User implements user {
+class userClass implements User {
   userName: string;
   roomId: string;
 
@@ -47,19 +42,14 @@ class User implements user {
   }
 }
 
-interface enterReq {
-  roomId: string;
-  name: string;
-}
-
 @Injectable()
-@WebSocketGateway(8080, { cors: { origin: '*' } })
+@WebSocketGateway(SERVER_CONFIG.SOCKET_PORT, { cors: { origin: '*' } })
 export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
   constructor(private readonly roomService: RoomService) {}
 
-  roomList: Map<string, room> = new Map<string, room>();
-  userList: Map<string, user> = new Map<string, user>();
+  roomList: Map<string, Room> = new Map<string, Room>();
+  userList: Map<string, User> = new Map<string, User>();
 
   // 소켓을 연결한다.
   async handleConnection(socket: Socket): Promise<void> {
@@ -78,6 +68,8 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (room.userList.size === 0) {
       console.log(`${roomID}'s Room is closed.`);
+      const dataStr = JSON.stringify(Array.from(room.pixelList.values()));
+      await this.roomService.updatePixel(roomID, dataStr);
       this.roomList.delete(roomID);
     } else {
       const userList: string[] = [];
@@ -92,30 +84,36 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // 방 입장
   @SubscribeMessage('enter')
-  async enterRoom(socket: Socket, data: enterReq): Promise<void> {
+  async enterRoom(socket: Socket, data: EnterReq): Promise<void> {
     let room = this.roomList.get(data.roomId);
     const userList: string[] = [];
     const pixelData: Pixel[] = [];
 
     if (room === undefined) {
       const newRoomID = crypto.randomUUID();
-      this.roomList.set(data.roomId, new Room(newRoomID.toString()));
+      this.roomList.set(data.roomId, new roomClass(newRoomID.toString()));
       room = this.roomList.get(data.roomId);
 
-      const dbData = (await this.roomService.findRoom(data.roomId)).data;
-      room.pixelList = this.convertData(dbData);
+      const dbData = await this.roomService.findRoom(data.roomId);
+      room.pixelList = this.convertData(dbData.pixelData);
+      room.limitUser = dbData.limitUser;
       console.log(`${data.roomId}'s Room is open.`);
     }
 
-    console.log(`${data.roomId}'s Room ::: ${room.uuid} connected.`);
+    if (room.limitUser == room.userList.size) {
+      console.error(`${data.roomId}'s Room is full.`);
+      throw new WsException('Error occurred while creating the room.');
+    }
 
     const uuid = room.uuid;
+    console.log(`${data.roomId}'s Room ::: ${room.uuid} connected.`);
+
     if (socket.rooms.has(uuid)) {
       return;
     }
 
-    this.userList.set(socket.id, new User(data.name, data.roomId));
-    room.userList.set(socket.id, new User(data.name, data.roomId));
+    this.userList.set(socket.id, new userClass(data.name, data.roomId));
+    room.userList.set(socket.id, new userClass(data.name, data.roomId));
 
     for (const item of room.userList.values()) {
       userList.push(item.userName);
@@ -179,7 +177,7 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (const roomID of this.roomList.keys()) {
       const room = this.roomList.get(roomID);
       const dataStr = JSON.stringify(Array.from(room.pixelList.values()));
-      this.roomService.updatePixel(roomID, dataStr);
+      await this.roomService.updatePixel(roomID, dataStr);
     }
   }
 }

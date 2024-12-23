@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Room } from 'src/database/entity/room.entity';
+import { Room } from 'src/database/entities/room.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -27,7 +27,7 @@ export class RoomService {
   async updatePixel(id: string, data: string): Promise<any> {
     const result = await this.usersRepository.update(
       { id: id },
-      { id: id, data: data },
+      { id: id, pixelData: data },
     );
 
     return result;

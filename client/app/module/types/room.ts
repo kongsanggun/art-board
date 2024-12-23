@@ -2,5 +2,6 @@ export interface RoomData {
   id: string;
   name: string;
   detail: string;
-  data: string;
+  limitUser: number;
+  pixelData: string;
 }
