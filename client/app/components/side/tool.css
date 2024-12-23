@@ -17,5 +17,16 @@
 
   display: flex;
   flex-direction: row;
-  justify-content: start;
+  justify-content: flex-start;
+}
+
+@media screen and (max-width: 767px) {
+  .toolTitle {
+    font-size: 1rem;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .toolDetail {
+    height: 2rem;
+  }
 }

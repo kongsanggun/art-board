@@ -32,6 +32,16 @@
 }
 .buttonInfo:hover{
   border: 0px solid rgb(59, 79, 121);
-  background-color: rgb(123, 126, 132);
+  background-color: var(--sub-color);
   color: rgb(248, 249, 252);
+}
+
+@media screen and (max-width: 767px) {
+  .titleRow {
+    font-size: 1.25rem;
+  }
+
+  .buttonInfo {
+    font-size: 1.5rem;
+  }
 }

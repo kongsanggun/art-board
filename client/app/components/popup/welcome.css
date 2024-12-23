@@ -30,7 +30,7 @@
 
   padding: 1.25rem;
 
-  background: rgb(249, 249, 251);
+  background: var(--main-color);
   border-radius: 1rem;
   box-shadow: 10px 10px 20px rgba(159, 159, 159);
 
@@ -98,7 +98,7 @@
   color: rgb(107, 114, 128);
 }
 input:hover{
-  border: 1.5px solid rgb(123, 126, 132);
+  border: 1.5px solid var(--sub-color);
 }
 input:focus{
   outline: 0px;
@@ -129,7 +129,7 @@ input:focus{
 }
 .welcomeButton:hover{
   border: 0px solid rgb(59, 79, 121);
-  background-color: rgb(123, 126, 132);
+  background-color: var(--sub-color);
   color: rgb(248, 249, 252);
 }
 

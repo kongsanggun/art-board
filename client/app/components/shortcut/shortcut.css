@@ -5,7 +5,7 @@
   z-index: 10;
   height: 4rem;
   width: 1rem;
-  background-color: rgb(123, 126, 132);
+  background-color: var(--sub-color);
 
   border-top-right-radius: 1rem;
   border-bottom-left-radius: 0;
@@ -20,12 +20,12 @@
   height: 3rem;
   width: 12rem;
   
-  border: 2px rgb(123, 126, 132) solid;
+  border: 2px var(--sub-color) solid;
   border-right: 0px;
 
   display: flex;
   flex-direction: row;
-  justify-content: start;
+  justify-content: flex-start;
   align-content: center;
   align-items: center;
 }
@@ -37,10 +37,10 @@
   padding: 2px;
 
   border: 0px;
-  border-right: 2px rgb(123, 126, 132) solid;
+  border-right: 2px var(--sub-color) solid;
 
   background: rgba(0, 0, 0, 0);
-  fill: rgb(123, 126, 132);
+  fill: var(--sub-color);
 
   display: flex;
   justify-content: center;
@@ -50,17 +50,17 @@
 
 .shortcutButton:hover{
   fill: #212121;
-  background: rgb(123, 126, 132);
+  background: var(--sub-color);
 }
 
 .shortcutButton:active{
   fill: #212121;
-  background: rgb(123, 126, 132);
+  background: var(--sub-color);
 }
 
 .shortcutButton_active {
   fill: #EDEEF4;
-  background: rgb(123, 126, 132);
+  background: var(--sub-color);
 }
 
 @media screen and (max-width: 767px) {
@@ -80,10 +80,6 @@
     animation-name: hoverHight;
     animation-duration: 0.25s;
     animation-fill-mode: both;
-  }
-
-  .shortcut {
-    border-right: 2px rgb(123, 126, 132) solid;
   }
 }
 

@@ -3,17 +3,19 @@
   height: 2048px;
 
   display: flex;
-  justify-content: center;
-  align-content: center;
-  align-items: center;
 }
 
 .canvas {
   width: 2048px;
   height: 2048px;
-  outline: 0.25rem solid #d1cbcb;
   cursor: none;
   
   overflow-x: auto;
   overflow-y: auto;
+}
+
+@media screen and (max-width: 767px) {
+  .canvas {
+    cursor: auto;
+  }
 }

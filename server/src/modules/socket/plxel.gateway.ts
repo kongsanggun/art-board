@@ -101,6 +101,7 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     if (room.limitUser == room.userList.size) {
+      // TODO : 방이 꽉 찼을 때 처리
       console.error(`${data.roomId}'s Room is full.`);
       throw new WsException('Error occurred while creating the room.');
     }

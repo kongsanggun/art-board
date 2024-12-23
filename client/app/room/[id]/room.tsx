@@ -16,6 +16,8 @@ import EnterToggle from '../../components/toggle/enterToggle';
 import {boardSocket} from '../../module/websocket/websocket'
 import { RoomData } from '@/app/module/types/room';
 
+// TODO : 방이 꽉 찼을 때 처리
+
 export default function Room ({room}: {room: RoomData}) {
     const afterFunction = {
         enter : (responce : SocketResponce) => {

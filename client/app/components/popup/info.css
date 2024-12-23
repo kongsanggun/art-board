@@ -22,12 +22,13 @@
 
 .info {
   width: 80dvw;
+  height: 80dvh;
   max-width: 560px;
-  height: fit-content;
+  max-height: 590px;
 
   padding: 1.25rem;
 
-  background: rgb(249, 249, 251);
+  background: var(--main-color);
   border-radius: 1rem;
 
   position: fixed;
@@ -54,8 +55,8 @@
 .infoDetail {
   width: 90%;
   min-height: 50px;
-  min-height: 40%;
-  max-height: 250px;
+  min-height: 60%;
+  max-height: 300px;
   border-radius: 6px;
   padding: 1rem;
   margin: 1.5rem 0 1.5rem 0;
@@ -95,6 +96,42 @@
 }
 .infoBtn:hover{
   border: 0px solid rgb(59, 79, 121);
-  background-color: rgb(123, 126, 132);
+  background-color: var(--sub-color);
   color: rgb(248, 249, 252);
+}
+
+@media screen and (max-width: 767px) {
+  .info {
+    padding: 1rem;
+  }
+
+  .info > h1 {
+    font-size: 1.5rem;
+  }
+
+  .infoDetail{
+    font-size: 1rem;
+    margin: 1rem 0 1rem 0;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .infoBtn{
+    width: 90px;
+    height: 30px;
+    border-radius: 4px;
+  
+    margin: 0.5rem 0 0.5rem 0;
+    font-size: 12px;
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .info > h1 {
+    font-size: 1.25rem;
+  }
+
+  .infoDetail{
+    font-size: 0.75rem;
+  }
 }
