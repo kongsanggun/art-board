@@ -1,0 +1,32 @@
+.toolTitle {
+  width: fit-content;
+  height: fit-content;
+
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: rgb(107, 114, 128);
+
+  margin: 0 0 0.5rem 0;
+}
+
+.toolDetail {
+  width: 100%;
+  height: 2.5rem;
+
+  margin: 0 0 1rem 0;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+@media screen and (max-width: 767px) {
+  .toolTitle {
+    font-size: 1rem;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .toolDetail {
+    height: 2rem;
+  }
+}

@@ -1,0 +1,45 @@
+:root {
+  --main-color: #f9f9fb;
+	--sub-color: #7b7e84;
+}
+
+body {
+  font-family: 'NanumBarunGothic';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  max-width: 100vw;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cousor{
+  border: 1px solid rgba(58, 58, 58, 0.35);
+  background: rgba(255, 255, 255, 0);
+  position: fixed;
+  z-index: 100;
+  height: 5px;
+  width: 5px;
+  cursor: none;
+  pointer-events:none;
+}
+
+@media screen and (max-width: 767px) {
+  .cousor {
+    display: none;
+  }
+}
+
+@media screen and (min-width : 768px) {
+  .cousor {
+    display: block;
+  }
+}

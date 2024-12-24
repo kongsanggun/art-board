@@ -1,0 +1,92 @@
+.sideButton {
+  position: fixed;
+  left: 0px;
+  top: calc(50dvh - 2rem);
+  z-index: 10;
+  height: 4rem;
+  width: 1rem;
+  background-color: var(--sub-color);
+
+  border-top-right-radius: 1rem;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 1rem;
+}
+
+.shortcut {
+  position: fixed;
+  left: calc(50dvw - 6rem);
+  top: calc(100dvh - 5rem);
+
+  height: 3rem;
+  width: 12rem;
+  
+  border: 2px var(--sub-color) solid;
+  border-right: 0px;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-content: center;
+  align-items: center;
+}
+
+.shortcutButton {
+  width: 3rem;
+  height: 3rem;
+
+  padding: 2px;
+
+  border: 0px;
+  border-right: 2px var(--sub-color) solid;
+
+  background: rgba(0, 0, 0, 0);
+  fill: var(--sub-color);
+
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+
+.shortcutButton:hover{
+  fill: #212121;
+  background: var(--sub-color);
+}
+
+.shortcutButton:active{
+  fill: #212121;
+  background: var(--sub-color);
+}
+
+.shortcutButton_active {
+  fill: #EDEEF4;
+  background: var(--sub-color);
+}
+
+@media screen and (max-width: 767px) {
+  .sideButton {
+    left: 2rem;
+    top: 0px;
+
+    height: 1rem;
+    width: 4rem;
+  
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+  }
+  
+  .sideButton:hover {
+    animation-name: hoverHight;
+    animation-duration: 0.25s;
+    animation-fill-mode: both;
+  }
+}
+
+@media screen and (min-width : 768px) {
+  .sideButton:hover {
+    animation-name: hoverWidth;
+    animation-duration: 0.25s;
+    animation-fill-mode: both;
+  }
+}

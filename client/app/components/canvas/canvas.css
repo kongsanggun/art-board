@@ -1,0 +1,21 @@
+.canvasWrapper {
+  width: 2048px;
+  height: 2048px;
+
+  display: flex;
+}
+
+.canvas {
+  width: 2048px;
+  height: 2048px;
+  cursor: none;
+  
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+@media screen and (max-width: 767px) {
+  .canvas {
+    cursor: auto;
+  }
+}
