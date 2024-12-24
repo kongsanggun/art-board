@@ -16,24 +16,23 @@ import EnterToggle from '../../components/toggle/enterToggle';
 import {boardSocket} from '../../module/websocket/websocket'
 import { RoomData } from '@/app/module/types/room';
 
-// TODO : 방이 꽉 찼을 때 처리
-
 export default function Room ({room}: {room: RoomData}) {
     const afterFunction = {
         enter : (responce : SocketResponce) => {
             const userList = responce.userList;
-            setEnterToggle(true);
+            setWelcomePopup(() => false);
+            setEnterToggle((value) => value + 1);
             setToggleName(userList[userList.length - 1]);
             setToggleMassage("님이 입장하셨습니다.");
-            setUserList(userList);
-            setTimeout(() => {setEnterToggle(false)}, 1500);
+            setUserList(responce.userList);
+            setTimeout(() => {setEnterToggle((value) => value - 1)}, 1500);
         },
         left : (responce : SocketResponce) => {
-            setEnterToggle(true);
+            setEnterToggle((value) => value + 1);
             setToggleName(responce.name + "");
             setToggleMassage("님이 퇴장하셨습니다.");
             setUserList(responce.userList);
-            setTimeout(() => {setEnterToggle(false)}, 1500);
+            setTimeout(() => {setEnterToggle((value) => value - 1)}, 1500);
         },
         pixel : (responce : SocketResponce) => {
             const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -73,6 +72,13 @@ export default function Room ({room}: {room: RoomData}) {
             const pointY = Number(data.location.split(',')[1])
 
             ctx.clearRect(pointX, pointY, Number(data.brashSize), Number(data.brashSize));
+        },
+        full : () => {
+            setWelcomePopup(() => true);
+            setEnterToggle((value) => value + 1);
+            setToggleName("방이 꽉 찼습니다.");
+            setToggleMassage("");
+            setTimeout(() => {setEnterToggle((value) => value - 1)}, 1500);
         }
     }
 
@@ -81,14 +87,21 @@ export default function Room ({room}: {room: RoomData}) {
     const [userList, setUserList] = useState<string[]>([]);
 
     const [welcomePopup, setWelcomePopup] = useState(true);
-    const [enterToggle, setEnterToggle] = useState(true);
+    const [enterToggle, setEnterToggle] = useState(0);
     const [sideToggle, setSideToggle] = useState(false);
 
     const [toggleName, setToggleName] = useState('');
     const [toggleMassage, setToggleMassage] = useState('');
 
     const closeAction = (name: string) => {
-        setWelcomePopup(false)
+        if(name === "" || name === null) {
+            setEnterToggle((value) => value + 1);
+            setToggleName("이름을 입력해주세요!");
+            setToggleMassage("");
+            setTimeout(() => {setEnterToggle((value) => value - 1)}, 1500);
+            return;
+        }
+
         socket.current.open(name, room.id)
         window.addEventListener('mousemove', animateCursor)
     }
@@ -116,12 +129,10 @@ export default function Room ({room}: {room: RoomData}) {
 
     return (
         <>
+            { enterToggle > 0 ? <EnterToggle name = {toggleName} massage = {toggleMassage}/> : null }
             {
-                welcomePopup ? <Welcome room = {room} onOpenAlert = {(name: string) => {closeAction(name)}}/> :
-                <div className = {welcomePopup ? 'blur' : ''}>
-                    {
-                        enterToggle ? <EnterToggle name = {toggleName} massage = {toggleMassage}/>: null
-                    }
+                welcomePopup ? <Welcome room = {room} onOpenAlert = {(name: string) => {closeAction(name)}}/> : 
+                <div>
                     <div className="cousor"></div>
                     {
                         sideToggle 

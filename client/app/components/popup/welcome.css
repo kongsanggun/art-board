@@ -10,7 +10,6 @@
   text-align: center;
   width: 100dvw;
   height: 100dvh;
-  background: rgba(0,0,0,0.425);
 }
 
 .popupEmpty {
@@ -29,10 +28,12 @@
   max-height: 640px;
 
   padding: 1.25rem;
+  margin-top: 0.75rem;
 
   background: var(--main-color);
+  border: 2px solid rgb(148, 163, 184);
   border-radius: 1rem;
-  box-shadow: 10px 10px 20px rgba(159, 159, 159);
+  box-shadow: 10px 10px 20px rgb(148, 163, 184);
 
   position: fixed;
   z-index: 20;
@@ -131,12 +132,6 @@ input:focus{
   border: 0px solid rgb(59, 79, 121);
   background-color: var(--sub-color);
   color: rgb(248, 249, 252);
-}
-
-.error {
-  height: 20px;
-  color: red;
-  font-weight: 700;
 }
 
 @media screen and (max-width: 767px) {

@@ -6,7 +6,6 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  WsException,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { SERVER_CONFIG } from 'src/configs/server.config';
@@ -58,28 +57,31 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // 소켓 연결 해제
   async handleDisconnect(socket: Socket): Promise<void> {
-    const roomID = this.userList.get(socket.id).roomId;
-    const room = this.roomList.get(roomID);
-    const name = this.userList.get(socket.id).userName;
+    console.log(socket.id);
+    if (this.userList.get(socket.id) !== undefined) {
+      const roomID = this.userList.get(socket.id).roomId;
+      const room = this.roomList.get(roomID);
+      const name = this.userList.get(socket.id).userName;
 
-    console.log(`${roomID}'s Room ::: ${room.uuid} disconnected.`);
-    room.userList.delete(socket.id);
-    this.userList.delete(socket.id);
+      console.log(`${roomID}'s Room ::: ${room.uuid} disconnected.`);
+      room.userList.delete(socket.id);
+      this.userList.delete(socket.id);
 
-    if (room.userList.size === 0) {
-      console.log(`${roomID}'s Room is closed.`);
-      const dataStr = JSON.stringify(Array.from(room.pixelList.values()));
-      await this.roomService.updatePixel(roomID, dataStr);
-      this.roomList.delete(roomID);
-    } else {
-      const userList: string[] = [];
-      for (const item of room.userList.values()) {
-        userList.push(item.userName);
+      if (room.userList.size === 0) {
+        console.log(`${roomID}'s Room is closed.`);
+        const dataStr = JSON.stringify(Array.from(room.pixelList.values()));
+        await this.roomService.updatePixel(roomID, dataStr);
+        this.roomList.delete(roomID);
+      } else {
+        const userList: string[] = [];
+        for (const item of room.userList.values()) {
+          userList.push(item.userName);
+        }
+        this.server.to(roomID).emit('left', { roomID, userList, name });
       }
-      this.server.to(roomID).emit('left', { roomID, userList, name });
-    }
 
-    console.log(`Client ${socket.id} disconnected.`);
+      console.log(`Client ${socket.id} disconnected.`);
+    }
   }
 
   // 방 입장
@@ -100,13 +102,13 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.log(`${data.roomId}'s Room is open.`);
     }
 
+    const uuid = room.uuid;
     if (room.limitUser == room.userList.size) {
-      // TODO : 방이 꽉 찼을 때 처리
-      console.error(`${data.roomId}'s Room is full.`);
-      throw new WsException('Error occurred while creating the room.');
+      console.log(`${data.roomId}'s Room is full.`);
+      socket.emit('full', { roomID: room.uuid });
+      return;
     }
 
-    const uuid = room.uuid;
     console.log(`${data.roomId}'s Room ::: ${room.uuid} connected.`);
 
     if (socket.rooms.has(uuid)) {

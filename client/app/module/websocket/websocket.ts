@@ -10,6 +10,7 @@ type afterFunction = {
 export class boardSocket {
   socket: Socket;
   afterFunction: afterFunction;
+  isConnect: boolean = false;
 
   constructor(afterFunction: afterFunction) {
     if(process.env.NEXT_PUBLIC_REACT_APP_URL === '' || process.env.NEXT_PUBLIC_REACT_APP_URL === undefined) {
@@ -25,13 +26,15 @@ export class boardSocket {
   }
 
   open = (name : string, roomId: string) => {
-    if(this.socket.disconnect()) {
+    if(!this.isConnect) {
       this.socket.open();
       this.socket.on("connect", () => {
-        this.socket.emit("enter", {name : name, roomId : roomId});
-    });
+        this.isConnect = true;
+      });
+      this.on();
     }
-    this.on();
+
+    this.socket.emit("enter", {name : name, roomId : roomId});
   }
 
   on = () => {

@@ -7,17 +7,12 @@ import './welcome.css';
 
 const Welcome = ({ room, onOpenAlert }: { room: RoomData, onOpenAlert: (arg: string) => void}) => {
     const [text, setText] = useState('');
-    const [error, setError] = useState(false);
 
     const handleChange = (event:React.ChangeEvent<HTMLInputElement>) => {
         setText(event.target.value);
     };
 
     const start = () => {
-        if(text === "" || text === null) {
-            setError(true)
-            return;
-        }
         onOpenAlert(text)
     }
 
@@ -41,7 +36,6 @@ const Welcome = ({ room, onOpenAlert }: { room: RoomData, onOpenAlert: (arg: str
                 </div>
 
                 <div>
-                {error ? <p className="error">이름을 입력해주세요!</p> : <p className="error"> </p>}
                 <button className="welcomeButton" onClick={start}> 시작하기 </button>
                 </div>
             </div>
