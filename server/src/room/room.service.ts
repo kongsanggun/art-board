@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { renderHTML } from 'src/common/func/renderHTML';
 import { Room } from 'src/database/entities/room.entity';
 import { Repository } from 'typeorm';
 
@@ -19,6 +20,13 @@ export class RoomService {
 
     if (result === null) {
       throw new NotFoundException(`${id} 를 찾을 수 없습니다.`);
+    }
+
+    if (result.detail !== null) {
+      result.detail = await renderHTML(
+        result.detail,
+        new URL(`${process.env.URL_ORIGIN}${id}`),
+      );
     }
 
     return result;

@@ -20,10 +20,8 @@ const Welcome = ({ room, onOpenAlert }: { room: RoomData, onOpenAlert: (arg: str
         <div className="popupBack">
             <div className="popupEmpty"> </div>
             <div className="popup">
-                <h1>{room.name}의 방명록</h1>
-                <div className="detail">
-                    {room.detail}
-                </div>
+                <div className="title">{room.name}의 방명록</div>
+                <div className="detail" dangerouslySetInnerHTML={{__html: room.detail}}/>
                 <div className="inputDiv">
                     <p><b>닉네임</b>을 입력해주세요.</p>
                     <input id="userName"
@@ -34,7 +32,6 @@ const Welcome = ({ room, onOpenAlert }: { room: RoomData, onOpenAlert: (arg: str
                         onChange={handleChange}
                         placeholder="사용자 이름"></input>
                 </div>
-
                 <div>
                 <button className="welcomeButton" onClick={start}> 시작하기 </button>
                 </div>

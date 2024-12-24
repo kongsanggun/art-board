@@ -57,7 +57,6 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // 소켓 연결 해제
   async handleDisconnect(socket: Socket): Promise<void> {
-    console.log(socket.id);
     if (this.userList.get(socket.id) !== undefined) {
       const roomID = this.userList.get(socket.id).roomId;
       const room = this.roomList.get(roomID);
