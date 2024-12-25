@@ -18,13 +18,15 @@ const Canvas = ({ pixelData, sendHanlder }: {pixelData: Pixel, sendHanlder: (dat
         if(ctx === null) return;
         if(e.target === null) return;
 
+        const target = e.target as HTMLCanvasElement;
+
         ctx.fillStyle = pixelData.color;
 
-        const leftCanvas = (e.clientX - e.target.offsetLeft + window.scrollX);
-        const topCanvas = (e.clientY - e.target.offsetTop + window.scrollY);
+        const leftCanvas = (e.clientX - target.offsetLeft + window.scrollX);
+        const topCanvas = (e.clientY - target.offsetTop + window.scrollY);
 
-        const rateX = (e.target.width / e.target.offsetWidth);
-        const rateY = (e.target.height / e.target.offsetHeight);
+        const rateX = (target.width / target.offsetWidth);
+        const rateY = (target.height / target.offsetHeight);
 
         pointX = Math.floor(leftCanvas * rateX)
         pointY = Math.floor(topCanvas * rateY)
@@ -48,20 +50,20 @@ const Canvas = ({ pixelData, sendHanlder }: {pixelData: Pixel, sendHanlder: (dat
 
             if (pixelData.tool === "erase") {
     
-                ctx.clearRect(x1, y1, pixelData.brashSize, pixelData.brashSize);
+                ctx.clearRect(x1, y1, Number(pixelData.brashSize), Number(pixelData.brashSize));
                 sendHanlder(x1 + ',' + y1);
             } else {
-                ctx.fillRect(x1, y1, pixelData.brashSize, pixelData.brashSize);
+                ctx.fillRect(x1, y1, Number(pixelData.brashSize), Number(pixelData.brashSize));
                 sendHanlder(x1 + ',' + y1);
             }
         }
 
         prvPoint = [pointX, pointY]
         if (pixelData.tool === "erase") {
-            ctx.clearRect(pointX, pointY, pixelData.brashSize, pixelData.brashSize);
+            ctx.clearRect(pointX, pointY, Number(pixelData.brashSize), Number(pixelData.brashSize));
             sendHanlder(pointX + ',' + pointY);
         } else {
-            ctx.fillRect(pointX, pointY, pixelData.brashSize, pixelData.brashSize);
+            ctx.fillRect(pointX, pointY, Number(pixelData.brashSize), Number(pixelData.brashSize));
             sendHanlder(pointX + ',' + pointY);
         }
     }
@@ -70,7 +72,7 @@ const Canvas = ({ pixelData, sendHanlder }: {pixelData: Pixel, sendHanlder: (dat
     const drawMove = (e: unknown) => {
         if(pixelData.tool === "move") return;
         if (prvPoint[0] > 0 && prvPoint[1] > 0) {
-            draw(e)
+            draw(e as MouseEvent)
         } 
     }
 
@@ -80,9 +82,9 @@ const Canvas = ({ pixelData, sendHanlder }: {pixelData: Pixel, sendHanlder: (dat
     }
 
     // 캔버스 포인터 입력하기 
-    const drawDown = (e: any) => {
+    const drawDown = (e: unknown) => {
         if(pixelData.tool === "move") return;
-        draw(e)
+        draw(e as MouseEvent)
     }
 
     // 포인터가 캔버스에 떠났을 경우
