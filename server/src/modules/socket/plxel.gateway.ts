@@ -160,7 +160,7 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }
 
-    this.server.to(roomID).emit('clear', { roomID: uuid, data });
+    this.server.to(uuid).emit('clear', { roomID: uuid, data });
   }
 
   private convertData(dbData: string): Map<string, Pixel> {
