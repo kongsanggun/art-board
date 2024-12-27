@@ -1,7 +1,8 @@
+import { BaseEntity } from 'src/common/entities/base.entity';
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity()
-export class Room {
+export class Room extends BaseEntity {
   @PrimaryColumn()
   id: string;
 

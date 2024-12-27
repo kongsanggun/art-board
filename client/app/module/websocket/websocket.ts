@@ -48,9 +48,9 @@ export class boardSocket {
     const param = {
         "color": pixelData.color,
         "location": pixelData.location,
-        "userName": pixelData.userName,
+        "userName": "",
         "brashSize": pixelData.brashSize,
-        "timestamp": "null"
+        "timestamp": new Date().toUTCString()
     };
     this.socket.emit(massge, param);
   }

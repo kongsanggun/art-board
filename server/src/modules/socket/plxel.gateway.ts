@@ -63,22 +63,23 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const name = this.userList.get(socket.id).userName;
 
       console.log(`${roomID}'s Room ::: ${room.uuid} disconnected.`);
-      room.userList.delete(socket.id);
       this.userList.delete(socket.id);
 
-      if (room.userList.size === 0) {
+      if (room.userList.size - 1 === 0) {
         console.log(`${roomID}'s Room is closed.`);
         const dataStr = JSON.stringify(Array.from(room.pixelList.values()));
         await this.roomService.updatePixel(roomID, dataStr);
         this.roomList.delete(roomID);
       } else {
         const userList: string[] = [];
-        for (const item of room.userList.values()) {
-          userList.push(item.userName);
+        for (const key of room.userList.keys()) {
+          if (key === socket.id) continue;
+          userList.push(room.userList.get(key).userName);
         }
-        this.server.to(roomID).emit('left', { roomID, userList, name });
+        this.server.to(room.uuid).emit('left', { roomID, userList, name });
       }
-
+      room.userList.delete(socket.id);
+      socket.leave(room.uuid);
       console.log(`Client ${socket.id} disconnected.`);
     }
   }
@@ -136,6 +137,7 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const room = this.roomList.get(roomID);
     const uuid = room.uuid;
 
+    data.userName = socket.id;
     room.pixelList.set(data.location, data);
     this.server.to(uuid).emit('draw', { roomID: uuid, data });
   }
@@ -175,7 +177,6 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @Cron('* * * * * *')
   async pixelDateUpdate(): Promise<void> {
-    console.log(new Date().toUTCString() + ' ::: data update');
     for (const roomID of this.roomList.keys()) {
       const room = this.roomList.get(roomID);
       const dataStr = JSON.stringify(Array.from(room.pixelList.values()));
