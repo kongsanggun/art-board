@@ -8,10 +8,6 @@ import './welcome.css';
 const Welcome = ({ room, onOpenAlert }: { room: RoomData, onOpenAlert: (arg: string) => void}) => {
     const [text, setText] = useState('');
 
-    const handleChange = (event:React.ChangeEvent<HTMLInputElement>) => {
-        setText(event.target.value);
-    };
-
     const start = () => {
         onOpenAlert(text)
     }
@@ -29,7 +25,7 @@ const Welcome = ({ room, onOpenAlert }: { room: RoomData, onOpenAlert: (arg: str
                         type="text"
                         value={text}
                         maxLength={20}
-                        onChange={handleChange}
+                        onChange={e => setText(e.target.value)}
                         placeholder="사용자 이름"></input>
                 </div>
                 <div>

@@ -21,7 +21,8 @@
   height: 1.75rem;
   border: 0px solid rgb(148, 163, 184);
   background-color: rgba(225,227,236);
-
+  
+  font-size: 1.25rem;
   border-radius: 100%;
   
   display: flex;
@@ -39,9 +40,6 @@
 @media screen and (max-width: 767px) {
   .titleRow {
     font-size: 1.25rem;
-  }
-
-  .buttonInfo {
-    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
   }
 }

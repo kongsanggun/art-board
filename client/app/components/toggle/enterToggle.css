@@ -12,7 +12,8 @@
 }
 
 .toggle {
-  width: 480px;
+  width: 80dvw;
+  max-width: 560px;
   height: 4rem;
   border-radius: 1rem;
   
@@ -36,7 +37,7 @@
 
 @media screen and (max-width: 767px) {
   .toggle {
-    width: 330px;
+    width: 80dvw;
     height: 3rem;
 
     font-size: 1rem;

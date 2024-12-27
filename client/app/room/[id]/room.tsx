@@ -28,6 +28,7 @@ export default function Room ({room}: {room: RoomData}) {
             setTimeout(() => {setEnterToggle((value) => value - 1)}, 1500);
         },
         left : (responce : SocketResponce) => {
+            console.log(responce);
             setEnterToggle((value) => value + 1);
             setToggleName(responce.name + "");
             setToggleMassage("님이 퇴장하셨습니다.");

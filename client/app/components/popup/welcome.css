@@ -28,7 +28,7 @@
   max-height: 640px;
 
   padding: 1.25rem;
-  margin-top: 0.75rem;
+  margin-top: 1.75rem;
 
   background: var(--main-color);
   border: 2px solid rgb(148, 163, 184);
@@ -57,7 +57,7 @@
 }
 
 .detail {
-  width: 90%;
+  width: 100%;
   min-height: 50px;
   min-height: 40%;
   max-height: 250px;
@@ -84,7 +84,7 @@
 }
 
 .inputDiv {
-  width: 90%;
+  width: 100%;
   height: fit-content;
   margin-bottom: 1.5rem;
 
@@ -147,8 +147,12 @@ input:focus{
 }
 
 @media screen and (max-width: 767px) {
-  .popup > h1 {
+  .popup > .title {
     font-size: 1.5rem;
+  }
+
+  .inputDiv > p {
+    font-size: 1rem;
   }
 
   .detail{
@@ -169,7 +173,7 @@ input:focus{
 }
 
 @media screen and (max-width: 350px) {
-  .popup > h1 {
+  .popup > .title {
     font-size: 1.25rem;
   }
 }

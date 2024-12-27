@@ -42,7 +42,7 @@
   height: auto;
   border-radius: 1rem;
 
-  padding: 1rem;
+  padding: 1rem 1rem 0rem 1rem;
   margin-bottom: 1rem;
 
   background-color: #EDEEF4;
@@ -140,9 +140,13 @@
     height: calc(80dvh - 1rem);
   }
 
+  .sideTool {
+    padding: 1rem 1rem 0.5rem 1rem;
+  }
+
   .sideCloseButton {
     left: 2rem;
-    top: calc(80dvh + 1rem);
+    top: calc(85dvh - 2rem);
 
     height: 1rem;
     width: 4rem;
@@ -159,13 +163,17 @@
   }
 
   .toolDiv {
-    height: 2rem;
+    height: 2.5rem;
     border: 1.5px var(--sub-color) solid;
   }
 
+  .toolButton, .brashSize {
+    border-right: 1.5px var(--sub-color) solid;
+  }
+
   .toolButton, .brashSize, .historyButton{
-    width: 2rem;
-    height: 2rem;
+    width: 2.5rem;
+    height: 2.5rem;
   } 
 }
 

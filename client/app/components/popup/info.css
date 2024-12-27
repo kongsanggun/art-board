@@ -53,9 +53,9 @@
 }
 
 .infoDetail {
-  width: 90%;
+  width: 100%;
   min-height: 50px;
-  min-height: 60%;
+  min-height: 70%;
   max-height: 300px;
   border-radius: 6px;
   padding: 1rem;
@@ -117,7 +117,7 @@
     padding: 1rem;
   }
 
-  .info > h1 {
+  .info > .infoTitle {
     font-size: 1.5rem;
   }
 
@@ -127,19 +127,8 @@
   }
 }
 
-@media screen and (max-width: 550px) {
-  .infoBtn{
-    width: 90px;
-    height: 30px;
-    border-radius: 4px;
-  
-    margin: 0.5rem 0 0.5rem 0;
-    font-size: 12px;
-  }
-}
-
 @media screen and (max-width: 350px) {
-  .info > h1 {
+  .info > .infoTitle {
     font-size: 1.25rem;
   }
 
