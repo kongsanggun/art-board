@@ -1,0 +1,49 @@
+name: aws deploy ci/cd
+  
+on:
+  push:
+    branches: [ 'main' ]
+  pull_request:
+    branches: [ 'main' ]
+
+env:
+  HOST: ${{ secrets.AWS_HOST }}
+  USERNAME: ${{ secrets.AWS_USERNAME }}
+  KEY: ${{ secrets.AWS_SSH_KEY }}
+  REGION : ${{ secrets.AWS_REGION }}
+
+jobs:
+  build-deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: configure AWS
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: excuting remote ssh commands
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ env.HOST }}
+          username: ${{ env.USERNAME }}
+          key: ${{ env.KEY }}
+          script: |
+            cd ~
+            sudo pm2 kill
+            cd art-board
+            git pull
+            cd client
+            sudo npm i
+            npm run build
+            sudo pm2 start "npm run start" --name front
+            cd ../
+            cd server
+            sudo npm i
+            sudo pm2 start "npm run start" --name back
