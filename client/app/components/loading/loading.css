@@ -1,0 +1,15 @@
+.loading-tmp {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 200;
+  display: flex;
+  justify-items: center;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 100dvw;
+  height: 100dvh;
+  background: var(--main-color);
+}

@@ -15,11 +15,13 @@ import EnterToggle from '../../components/toggle/enterToggle';
 
 import {boardSocket} from '../../module/websocket/websocket'
 import { RoomData } from '@/app/module/types/room';
+import Loading from '@/app/components/loading/loading';
 
 export default function Room ({room}: {room: RoomData}) {
     const afterFunction = {
         enter : (responce : SocketResponce) => {
             const userList = responce.userList;
+            setLoading(() => false);
             setWelcomePopup(() => false);
             setEnterToggle((value) => value + 1);
             setToggleName(userList[userList.length - 1]);
@@ -28,7 +30,6 @@ export default function Room ({room}: {room: RoomData}) {
             setTimeout(() => {setEnterToggle((value) => value - 1)}, 1500);
         },
         left : (responce : SocketResponce) => {
-            console.log(responce);
             setEnterToggle((value) => value + 1);
             setToggleName(responce.name + "");
             setToggleMassage("님이 퇴장하셨습니다.");
@@ -75,6 +76,7 @@ export default function Room ({room}: {room: RoomData}) {
             ctx.clearRect(pointX, pointY, Number(data.brashSize), Number(data.brashSize));
         },
         full : () => {
+            setLoading(() => false);
             setWelcomePopup(() => true);
             setEnterToggle((value) => value + 1);
             setToggleName("방이 꽉 찼습니다.");
@@ -88,6 +90,7 @@ export default function Room ({room}: {room: RoomData}) {
     const [userList, setUserList] = useState<string[]>([]);
 
     const [welcomePopup, setWelcomePopup] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [enterToggle, setEnterToggle] = useState(0);
     const [sideToggle, setSideToggle] = useState(false);
 
@@ -103,6 +106,7 @@ export default function Room ({room}: {room: RoomData}) {
             return;
         }
 
+        setLoading(() => true);
         socket.current.open(name, room.id)
         window.addEventListener('mousemove', animateCursor)
     }
@@ -131,6 +135,7 @@ export default function Room ({room}: {room: RoomData}) {
     return (
         <>
             { enterToggle > 0 ? <EnterToggle name = {toggleName} massage = {toggleMassage}/> : null }
+            { loading ? <Loading/>: null}
             {
                 welcomePopup ? <Welcome room = {room} onOpenAlert = {(name: string) => {closeAction(name)}}/> : 
                 <div>
