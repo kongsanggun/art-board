@@ -1,13 +1,21 @@
-import { Module } from '@nestjs/common';
-import { PixelGateway } from './plxel.gateway';
-import { RoomService } from 'src/room/room.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Room } from 'src/database/entities/room.entity';
-import { ScheduleModule } from '@nestjs/schedule';
+import { DynamicModule, Module } from '@nestjs/common';
+import { createPixelGateway, SocketModuleOptions } from './plxel.gateway';
+import { RoomModule } from 'src/room/room.module';
+import { RedisModule } from '../redis/redis.module';
+import { SocketStateService } from './socket-state.service';
 
 @Module({
-  imports: [ScheduleModule.forRoot(), TypeOrmModule.forFeature([Room])],
+  imports: [RoomModule],
   controllers: [],
-  providers: [PixelGateway, RoomService],
 })
-export class SocketModule {}
+export class SocketModule {
+  static register(options: SocketModuleOptions): DynamicModule {
+    const pixelGateway = createPixelGateway(options);
+
+    return {
+      module: SocketModule,
+      imports: [RoomModule, RedisModule],
+      providers: [pixelGateway, SocketStateService],
+    };
+  }
+}

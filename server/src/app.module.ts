@@ -4,6 +4,8 @@ import { RoomModule } from './room/room.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Room } from './database/entities/room.entity';
+import { SERVER_CONFIG } from './configs/server.config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -11,7 +13,10 @@ import { Room } from './database/entities/room.entity';
       envFilePath: `.env`,
       isGlobal: true,
     }),
-    SocketModule,
+    ScheduleModule.forRoot(),
+    ...SERVER_CONFIG.SOCKET_INSTANCES.map((socketOptions) =>
+      SocketModule.register(socketOptions),
+    ),
     RoomModule,
     TypeOrmModule.forRoot({
       type: 'mariadb',

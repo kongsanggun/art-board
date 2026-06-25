@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: art-board-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+spec:
+  rules:
+    - host: api.art-board.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: http-service
+                port:
+                  number: 8080
+
+    - host: websocket.art-board.local
+      http:
+        paths:
+          - path: /socket.io
+            pathType: Prefix
+            backend:
+              service:
+                name: websocket-service
+                port:
+                  number: 8081

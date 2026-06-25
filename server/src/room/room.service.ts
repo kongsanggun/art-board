@@ -11,6 +11,16 @@ export class RoomService {
     private usersRepository: Repository<Room>,
   ) {}
 
+  async createRoom(roomData: Room): Promise<Room | null> {
+    roomData.id = roomData.id || crypto.randomUUID();
+    const result = await this.usersRepository.save(roomData);
+    return result;
+  }
+
+  async findAllRooms(): Promise<Room[]> {
+    return await this.usersRepository.find();
+  }
+
   async findRoom(id: string): Promise<Room | null> {
     const result = await this.usersRepository
       .findOne({ where: { id } })

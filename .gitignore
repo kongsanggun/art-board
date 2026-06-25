@@ -1,0 +1,72 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Node
+node_modules/
+dist/
+build/
+coverage/
+.next/
+out/
+*.tsbuildinfo
+
+# env
+.env
+.env.*
+!.env.example
+!.env.sample
+
+client/.env
+client/.env.*
+!client/.env.example
+
+server/.env
+server/.env.*
+!server/.env.example
+
+compose/.env
+compose/.env.*
+!compose/.env.example
+
+# Terraform
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+**/terraform.tfvars
+**/terraform.tfvars.json
+**/*.tfplan
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Kubernetes secrets
+k8s/secret.yml
+k8s/secret.yaml
+!k8s/secret.example.yml
+!k8s/secret.example.yaml
+
+# Docker / local generated
+docker-compose.override.yml
+
+# Certificates / keys
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx

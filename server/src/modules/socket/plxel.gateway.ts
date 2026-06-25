@@ -1,54 +1,38 @@
-import { Injectable } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { createAdapter } from '@socket.io/redis-adapter';
 import {
+  OnGatewayInit,
   OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
-  WebSocketGateway,
   WebSocketServer,
+  WebSocketGateway,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { SERVER_CONFIG } from 'src/configs/server.config';
 import { RoomService } from 'src/room/room.service';
 import EnterReq from 'src/types/enter-req.type';
 
 import Pixel from 'src/types/pixel.type';
-import Room from 'src/types/room.type';
-import User from 'src/types/user.type';
+import { SocketStateService } from './socket-state.service';
+import { RedisService } from '../redis/redis.service';
+import { Inject, Injectable } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 
-class roomClass implements Room {
-  uuid: string;
-  userList: Map<string, User>;
-  pixelList: Map<string, Pixel>;
-  limitUser: number;
-  updateTime: string;
-
-  constructor(uuid: string) {
-    this.uuid = uuid;
-    this.userList = new Map<string, User>();
-    this.pixelList = new Map<string, Pixel>();
-    this.updateTime = new Date().toDateString();
-  }
-}
-
-class userClass implements User {
-  userName: string;
-  roomId: string;
-
-  constructor(name: string, id: string) {
-    this.userName = name;
-    this.roomId = id;
-  }
-}
-
-@Injectable()
-@WebSocketGateway(SERVER_CONFIG.SOCKET_PORT, { cors: { origin: '*' } })
-export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class PixelGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer() server: Server;
-  constructor(private readonly roomService: RoomService) {}
 
-  roomList: Map<string, Room> = new Map<string, Room>();
-  userList: Map<string, User> = new Map<string, User>();
+  constructor(
+    private readonly roomService: RoomService,
+    private readonly redisService: RedisService,
+    private readonly socketStateService: SocketStateService,
+  ) {}
+
+  async afterInit(server: Server) {
+    const pubClient = await this.redisService.getClient();
+    const subClient = await this.redisService.duplicate();
+    server.adapter(createAdapter(pubClient, subClient));
+  }
 
   // 소켓을 연결한다.
   async handleConnection(socket: Socket): Promise<void> {
@@ -57,96 +41,112 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // 소켓 연결 해제
   async handleDisconnect(socket: Socket): Promise<void> {
-    if (this.userList.get(socket.id) !== undefined) {
-      const roomID = this.userList.get(socket.id).roomId;
-      const room = this.roomList.get(roomID);
-      const name = this.userList.get(socket.id).userName;
+    const removedUser = await this.socketStateService.removeUser(socket.id);
 
-      console.log(`${roomID}'s Room ::: ${room.uuid} disconnected.`);
-      this.userList.delete(socket.id);
-
-      if (room.userList.size - 1 === 0) {
-        console.log(`${roomID}'s Room is closed.`);
-        const dataStr = JSON.stringify(Array.from(room.pixelList.values()));
-        await this.roomService.updatePixel(roomID, dataStr);
-        this.roomList.delete(roomID);
-      } else {
-        const userList: string[] = [];
-        for (const key of room.userList.keys()) {
-          if (key === socket.id) continue;
-          userList.push(room.userList.get(key).userName);
-        }
-        this.server.to(room.uuid).emit('left', { roomID, userList, name });
-      }
-      room.userList.delete(socket.id);
-      socket.leave(room.uuid);
-      console.log(`Client ${socket.id} disconnected.`);
+    if (!removedUser) {
+      return;
     }
+
+    const { roomId, userName } = removedUser;
+
+    const roomMeta = await this.socketStateService.getRoomMeta(roomId);
+    const userCount = await this.socketStateService.getUserCount(roomId);
+
+    if (userCount === 0) {
+      const pixels = await this.socketStateService.getPixels(roomId);
+      const dataStr = JSON.stringify(pixels);
+
+      await this.roomService.updatePixel(roomId, dataStr);
+      await this.socketStateService.clearRoom(roomId);
+
+      return;
+    }
+
+    const userList = await this.socketStateService.getUsers(roomId);
+
+    this.server.to(roomMeta.uuid).emit('left', {
+      roomID: roomId,
+      userList,
+      name: userName,
+    });
   }
 
   // 방 입장
   @SubscribeMessage('enter')
   async enterRoom(socket: Socket, data: EnterReq): Promise<void> {
-    let room = this.roomList.get(data.roomId);
-    const userList: string[] = [];
-    const pixelData: Pixel[] = [];
+    let roomMeta = await this.socketStateService.getRoomMeta(data.roomId);
 
-    if (room === undefined) {
-      const newRoomID = crypto.randomUUID();
-      this.roomList.set(data.roomId, new roomClass(newRoomID.toString()));
-      room = this.roomList.get(data.roomId);
-
+    if (!roomMeta.uuid) {
       const dbData = await this.roomService.findRoom(data.roomId);
-      room.pixelList = this.convertData(dbData.pixelData);
-      room.limitUser = dbData.limitUser;
-      console.log(`${data.roomId}'s Room is open.`);
-    }
+      const uuid = crypto.randomUUID();
 
-    const uuid = room.uuid;
-    if (room.limitUser == room.userList.size) {
-      console.log(`${data.roomId}'s Room is full.`);
-      socket.emit('full', { roomID: room.uuid });
+      await this.socketStateService.setRoomMeta(
+        data.roomId,
+        uuid,
+        dbData.limitUser,
+      );
+
+      const pixels = this.convertData(dbData.pixelData);
+
+      for (const pixel of pixels.values()) {
+        await this.socketStateService.setPixel(data.roomId, pixel);
+      }
+
+      roomMeta = {
+        uuid,
+        limitUser: String(dbData.limitUser),
+      };
+    }
+    const userCount = await this.socketStateService.getUserCount(data.roomId);
+
+    if (userCount >= Number(roomMeta.limitUser)) {
+      socket.emit('full', { roomID: roomMeta.uuid });
       return;
     }
 
-    console.log(`${data.roomId}'s Room ::: ${room.uuid} connected.`);
+    await this.socketStateService.addUser(data.roomId, socket.id, data.name);
 
-    if (socket.rooms.has(uuid)) {
-      return;
-    }
+    const userList = await this.socketStateService.getUsers(data.roomId);
+    const pixelData = await this.socketStateService.getPixels(data.roomId);
 
-    this.userList.set(socket.id, new userClass(data.name, data.roomId));
-    room.userList.set(socket.id, new userClass(data.name, data.roomId));
+    socket.join(roomMeta.uuid);
 
-    for (const item of room.userList.values()) {
-      userList.push(item.userName);
-    }
+    this.server.to(roomMeta.uuid).emit('enter', {
+      uuid: roomMeta.uuid,
+      userList,
+    });
 
-    for (const pixel of room.pixelList.values()) {
-      pixelData.push(pixel);
-    }
-
-    socket.join(uuid);
-    this.server.to(uuid).emit('enter', { uuid, userList });
-    this.server.to(uuid).emit('pixel', { uuid, pixelData });
+    this.server.to(roomMeta.uuid).emit('pixel', {
+      uuid: roomMeta.uuid,
+      pixelData,
+    });
   }
 
   @SubscribeMessage('pen')
   async drawPixels(socket: Socket, data: Pixel): Promise<void> {
-    const roomID = this.userList.get(socket.id).roomId;
-    const room = this.roomList.get(roomID);
-    const uuid = room.uuid;
+    const socketData = await this.socketStateService.getSocket(socket.id);
+    const roomMeta = await this.socketStateService.getRoomMeta(
+      socketData.roomId,
+    );
 
     data.userName = socket.id;
-    room.pixelList.set(data.location, data);
-    this.server.to(uuid).emit('draw', { roomID: uuid, data });
+
+    await this.socketStateService.setPixel(socketData.roomId, data);
+
+    this.server.to(roomMeta.uuid).emit('draw', {
+      roomID: roomMeta.uuid,
+      data,
+    });
   }
 
   @SubscribeMessage('erase')
   async clearPixels(socket: Socket, data: Pixel): Promise<void> {
-    const roomID = this.userList.get(socket.id).roomId;
-    const room = this.roomList.get(roomID);
-    const uuid = room.uuid;
+    const socketData = await this.socketStateService.getSocket(socket.id);
+    const roomMeta = await this.socketStateService.getRoomMeta(
+      socketData.roomId,
+    );
+
+    data.userName = socket.id;
 
     const serachNumber = Number(data.brashSize);
     const [targetX, targetY] = data.location.split(',').map((v) => {
@@ -156,11 +156,14 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (let x = 0; x < serachNumber; x++) {
       for (let y = 0; y < serachNumber; y++) {
         const location = targetX + x + ',' + (targetY + y);
-        room.pixelList.delete(location);
+        await this.socketStateService.deletePixel(socketData.roomId, location);
       }
     }
 
-    this.server.to(uuid).emit('clear', { roomID: uuid, data });
+    this.server.to(roomMeta.uuid).emit('clear', {
+      roomID: roomMeta.uuid,
+      data,
+    });
   }
 
   private convertData(dbData: string): Map<string, Pixel> {
@@ -175,12 +178,63 @@ export class PixelGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return result;
   }
 
-  @Cron('* * * * * *')
-  async pixelDateUpdate(): Promise<void> {
-    for (const roomID of this.roomList.keys()) {
-      const room = this.roomList.get(roomID);
-      const dataStr = JSON.stringify(Array.from(room.pixelList.values()));
-      await this.roomService.updatePixel(roomID, dataStr);
-    }
+  async pixelDateUpdate(socket?: Socket): Promise<void> {
+    if (!socket) return;
+
+    const socketData = await this.socketStateService.getSocket(socket.id);
+    const pixels = await this.socketStateService.getPixels(socketData.roomId);
+    const dataStr = JSON.stringify(pixels);
+
+    await this.roomService.updatePixel(socketData.roomId, dataStr);
   }
 }
+
+export interface SocketModuleOptions {
+  name: string;
+  port: number;
+}
+
+export const createPixelGateway = (
+  options: SocketModuleOptions,
+): typeof PixelGateway => {
+  class RegisteredPixelGateway extends PixelGateway {
+    constructor(
+      @Inject(RoomService)
+      roomService: RoomService,
+
+      @Inject(RedisService)
+      redisService: RedisService,
+
+      @Inject(SocketStateService)
+      socketStateService: SocketStateService,
+    ) {
+      super(roomService, redisService, socketStateService);
+    }
+
+    async pixelDateUpdate(): Promise<void> {
+      return super.pixelDateUpdate();
+    }
+  }
+
+  Object.defineProperty(RegisteredPixelGateway, 'name', {
+    value: `${options.name.replace(/[^a-zA-Z0-9]/g, '')}PixelGateway`,
+  });
+
+  Injectable()(RegisteredPixelGateway);
+  WebSocketGateway(options.port, { cors: { origin: '*' } })(
+    RegisteredPixelGateway,
+  );
+
+  const descriptor = Object.getOwnPropertyDescriptor(
+    RegisteredPixelGateway.prototype,
+    'pixelDateUpdate',
+  );
+
+  Cron('* * * * * *')(
+    RegisteredPixelGateway.prototype,
+    'pixelDateUpdate',
+    descriptor,
+  );
+
+  return RegisteredPixelGateway;
+};

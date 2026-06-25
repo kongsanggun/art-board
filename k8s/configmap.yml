@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: art-board-config
+data:
+  NODE_ENV: "production"
+
+  APP_PORT: "8080"
+  SOCKET_PORTS: "8081"
+
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+
+  DB_HOST: "mariadb-service"
+  DB_PORT: "3306"
+  DB_DATABASE: "artboard"
+
+  NEXT_PUBLIC_BACK_END_URL: "http://http-service:8080"
+  NEXT_PUBLIC_REACT_APP_URL: "http://localhost:8081"

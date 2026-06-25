@@ -1,15 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PixelGateway } from './plxel.gateway';
+import { createPixelGateway, PixelGateway } from './plxel.gateway';
+import { RoomService } from '../../room/room.service';
 
 describe('GatewayGateway', () => {
   let gateway: PixelGateway;
+  const TestPixelGateway = createPixelGateway({
+    name: 'test-socket',
+    port: 8081,
+  });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PixelGateway],
+      providers: [
+        TestPixelGateway,
+        {
+          provide: RoomService,
+          useValue: {},
+        },
+      ],
     }).compile();
 
-    gateway = module.get<PixelGateway>(PixelGateway);
+    gateway = module.get<PixelGateway>(TestPixelGateway);
   });
 
   it('should be defined', () => {
